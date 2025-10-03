@@ -12,10 +12,11 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from './Assets/Logo.png';
-
+import { useNavigate } from "react-router-dom";
 const pages = ['Solutions', 'Features', 'Intelligence', "About Us"];
 
 function Header() {
+    const navigate = useNavigate();
     const [anchorElNav, setAnchorElNav] = React.useState()
     const [anchorElUser, setAnchorElUser] = React.useState()
 
@@ -60,10 +61,10 @@ function Header() {
 
                     {/* Right: Extra Buttons */}
                     <Box sx={{ display: "flex", gap: 2 }}>
-                        <Button variant="contained" color="secondary" sx={{ backgroundColor: "#B79F04" }}>
+                        <Button variant="contained" color="secondary" onClick={() => navigate("/login")} sx={{ backgroundColor: "#B79F04" }}>
                             Login
                         </Button>
-                        <Button variant="outlined" color="inherit">
+                        <Button variant="outlined" onClick={() => navigate("/register")} color="inherit">
                             Sign Up
                         </Button>
                     </Box>

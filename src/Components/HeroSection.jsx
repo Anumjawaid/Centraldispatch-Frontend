@@ -1,7 +1,9 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -64,10 +66,10 @@ export default function HeroSection() {
 
         {/* Buttons */}
         <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-          <Button variant="contained" color="secondary" size="large"sx={{ backgroundColor: "#B79F04" }}>
+          <Button variant="contained" color="secondary" size="large" onClick={() => navigate("/register")} sx={{ backgroundColor: "#B79F04" }}>
             I'm a Shipper
           </Button>
-          <Button variant="outlined" color="inherit" size="large">
+          <Button variant="outlined" color="inherit" size="large"onClick={() => navigate("/register")}>
             I'm a Carrier
           </Button>
         </Box>
