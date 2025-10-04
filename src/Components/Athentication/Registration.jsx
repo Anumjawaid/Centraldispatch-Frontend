@@ -67,7 +67,7 @@ export const RegistrationForm = () => {
 
   const handleClose = () => {
     setOpenModal(false);
-    navigate("/login");
+    navigate("/userdashboard");
   };
 
   return (
