@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -6,9 +6,25 @@ import {
   Typography,
   MenuItem,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { register_user, removeMessage } from "../../Store/authenticationReducer";
 
 export const RegistrationForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { loading, status, message } = useSelector(
+    (state) => state.authentication
+  );
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,16 +42,32 @@ export const RegistrationForm = () => {
     businessPhone: "",
   });
 
+  const [openModal, setOpenModal] = useState(false);
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    dispatch(register_user(formData));
+  };
+
+ useEffect(() => {
+  console.log(status, message, "status after");
+  if (
+    status === "fulfilled" &&
+    message?.toLowerCase().includes("user created successfully")
+  ) {
+    console.log("Opening modal...");
+    setOpenModal(true);
+    dispatch(removeMessage());
+  }
+}, [status, message, dispatch]);
+
+  const handleClose = () => {
+    setOpenModal(false);
+    navigate("/login");
   };
 
   return (
@@ -45,6 +77,7 @@ export const RegistrationForm = () => {
         justifyContent: "center",
         alignItems: "center",
         background: "linear-gradient(135deg, #3e4c7c, #5c72a2, #a3bffa)",
+        minHeight: "100vh",
       }}
     >
       <Paper
@@ -54,14 +87,20 @@ export const RegistrationForm = () => {
           maxWidth: 600,
           width: "100%",
           borderRadius: 3,
+          position: "relative",
         }}
       >
         <Typography variant="h5" align="center" gutterBottom>
           Registration
         </Typography>
 
+        {status === "rejected" && message && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit}>
-          {/* Full Name */}
           <TextField
             fullWidth
             label="Full Name"
@@ -71,7 +110,6 @@ export const RegistrationForm = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Email + Confirm Email */}
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               fullWidth
@@ -91,7 +129,6 @@ export const RegistrationForm = () => {
             />
           </Box>
 
-          {/* Password */}
           <TextField
             fullWidth
             type="password"
@@ -102,7 +139,6 @@ export const RegistrationForm = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Business Type */}
           <TextField
             select
             fullWidth
@@ -119,7 +155,6 @@ export const RegistrationForm = () => {
             ))}
           </TextField>
 
-          {/* Company Legal Name */}
           <TextField
             fullWidth
             label="Company Legal Name"
@@ -129,7 +164,6 @@ export const RegistrationForm = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Country / State / City / Zip */}
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               fullWidth
@@ -161,7 +195,6 @@ export const RegistrationForm = () => {
             />
           </Box>
 
-          {/* Company Address */}
           <TextField
             fullWidth
             label="Company Address"
@@ -171,7 +204,6 @@ export const RegistrationForm = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Operation Hours */}
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               fullWidth
@@ -193,7 +225,6 @@ export const RegistrationForm = () => {
             />
           </Box>
 
-          {/* Business Phone */}
           <TextField
             fullWidth
             label="Business Phone"
@@ -203,18 +234,30 @@ export const RegistrationForm = () => {
             sx={{ mb: 3 }}
           />
 
-          {/* Submit */}
           <Button
             type="submit"
             variant="contained"
             fullWidth
             sx={{ py: 1.2, fontWeight: "bold" }}
+            disabled={loading}
           >
-            Register
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Register"}
           </Button>
         </form>
       </Paper>
+
+      {/* ✅ Success Modal */}
+      <Dialog open={openModal} onClose={handleClose}>
+        <DialogTitle>Success</DialogTitle>
+        <DialogContent>
+          <Typography>You are successfully registered!</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="contained" color="primary">
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
-
