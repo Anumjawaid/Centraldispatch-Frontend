@@ -5,6 +5,7 @@ import { Home } from '../Pages/Home';
 // import { Register } from '../Components/Registration/Register';
 import { RegistrationForm} from '../Components/Athentication/Registration'
 import {LoginForm} from '../Components/Athentication/Login'
+import ShippingQuoteForm from '../Components/Posts/shippingQuote';
 
 export function AppRouter() {
     return (
@@ -14,6 +15,7 @@ export function AppRouter() {
                     <Route path='/' element={<Home />}> </Route>
                     <Route path="/login" element={<LoginForm/>}></Route>
                 <Route path="/register" element={<RegistrationForm/>}></Route>
+                <Route path="/addposts" element={<ShippingQuoteForm/>}></Route>
                 </Routes>
             </Router>
         </>

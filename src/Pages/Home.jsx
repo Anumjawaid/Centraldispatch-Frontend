@@ -1,7 +1,9 @@
 import Header from "../Components/Header"
 import HeroSection from '../Components/HeroSection'
 import {InfoCards} from '../Components/InfoCards'
+import {StatCards} from '../Components/InfoCards'
 import {Stats} from '../Components/StatsHome'
+import Footer from '../Components/Footer'
 export const Home = () => {
     return (
         <>
@@ -10,7 +12,9 @@ export const Home = () => {
             <InfoCards />
             <br/>
             <Stats />
-            <p>Home</p>
+            <br/>
+            <StatCards/>
+            <Footer />
         </>
     )
 
