@@ -8,6 +8,7 @@ import {LoginForm} from '../Components/Athentication/Login'
 import ShippingQuoteForm from '../Components/Posts/shippingQuote';
 import UserDashboard from '../Components/Dashboard/userpage'
 import UserView from '../Components/Dashboard/userDashboard';
+import AllListings from '../Components/Posts/AllListings';
 
 export function AppRouter() {
     return (
@@ -20,6 +21,7 @@ export function AppRouter() {
                 <Route path="/addposts" element={<ShippingQuoteForm/>}></Route>
                 <Route path="/userdashboard" element={<UserDashboard/>}></Route>
                  <Route path="/userdashboard1" element={<UserView/>}></Route>
+                 <Route path="/allListings" element={<AllListings/>}></Route>
                 </Routes>
             </Router>
         </>

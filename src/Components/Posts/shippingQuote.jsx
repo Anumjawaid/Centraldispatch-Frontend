@@ -9,6 +9,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import UserHeader from "../Dashboard/userHeader";
 
 const ShippingQuoteForm = () => {
   const [formData, setFormData] = useState({
@@ -89,6 +90,9 @@ const ShippingQuoteForm = () => {
   };
 
   return (
+    <React.Fragment>
+       <UserHeader/>
+
     <Box
       sx={{
         height: "100vh",
@@ -365,6 +369,7 @@ const ShippingQuoteForm = () => {
         </form>
       </Paper>
     </Box>
+    </React.Fragment>
   );
 };
 

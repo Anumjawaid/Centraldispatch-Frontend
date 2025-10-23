@@ -16,7 +16,7 @@ import Logo from '../Assets/Logo.png'
 import { HeaderBackground } from '../../Constants/Colors';
 
 const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = [{ name: 'Account', link: "/userdashboard1" }, { name: 'Add Listing', link: "/addposts" }, { name: 'Logout', link: "/" }];
 
 function UserHeader() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -38,11 +38,11 @@ function UserHeader() {
     };
 
     return (
-        <AppBar position="static" sx={{backgroundColor:HeaderBackground}}>
+        <AppBar position="static" sx={{ backgroundColor: HeaderBackground }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <img src={Logo} style={{ display: { xs: 'none', md: 'flex' }, mr: 1, height:'80px', width:"100px"}}/>
-                    
+                    <img src={Logo} style={{ display: { xs: 'none', md: 'flex' }, mr: 1, height: '80px', width: "100px" }} />
+
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
@@ -78,10 +78,10 @@ function UserHeader() {
                             ))}
                         </Menu> */}
                     </Box>
-                  {/* ths part needs to be dynamic with the User */}
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' },alignItems:"center",justifyContent:'center' }}>
+                    {/* ths part needs to be dynamic with the User */}
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, alignItems: "center", justifyContent: 'center' }}>
                         <Typography sx={{ textAlign: 'center' }}> {"Welcome, Anum Jawaid "}  </Typography>
-                     
+
                     </Box>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
@@ -106,8 +106,8 @@ function UserHeader() {
                             onClose={handleCloseUserMenu}
                         >
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                <MenuItem key={setting} onClick={()=>handleCloseUserMenu(setting.link)}>
+                                    <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
