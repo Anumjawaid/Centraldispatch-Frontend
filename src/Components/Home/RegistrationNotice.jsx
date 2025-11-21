@@ -5,9 +5,9 @@ const RegistrationNotice = () => {
   return (
     <Box
       sx={{
-        width: "100%",
+        width: "100vw",
         py: 10,
-        background: "linear-gradient(135deg, #1a2140 0%, #0d1226 100%)",
+        backgroundColor: background,
       }}
     >
       <Container maxWidth="md">
@@ -16,10 +16,9 @@ const RegistrationNotice = () => {
             p: 6,
             borderRadius: "32px",
             backdropFilter: "blur(12px)",
-            background:
-              "rgba(255, 255, 255, 0.06)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
+            background: SECONDARY,
+            border: `2px solid ${PRIMARY}`,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
           }}
         >
           {/* Heading */}
@@ -30,7 +29,7 @@ const RegistrationNotice = () => {
               fontWeight: 700,
               mb: 3,
               fontSize: "40px",
-              color: "#fff",
+              color: PRIMARY,
               letterSpacing: 0.5,
               fontFamily: "serif",
             }}
@@ -47,8 +46,8 @@ const RegistrationNotice = () => {
               px: 3,
               py: 1,
               borderRadius: "20px",
-              background: "linear-gradient(90deg, #6b8cff, #9eaaff)",
-              color: "#0d1226",
+              background: PRIMARY,
+              color: background,
               fontWeight: 700,
               fontSize: "16px",
               textAlign: "center",
@@ -61,7 +60,7 @@ const RegistrationNotice = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography
               sx={{
-                color: "#d6d9f0",
+                color: background,
                 fontSize: "18px",
                 textAlign: "center",
                 fontFamily: "serif",
@@ -72,7 +71,7 @@ const RegistrationNotice = () => {
 
             <Typography
               sx={{
-                color: "#d6d9f0",
+                color: background,
                 fontSize: "18px",
                 textAlign: "center",
                 fontFamily: "serif",
@@ -84,7 +83,7 @@ const RegistrationNotice = () => {
 
             <Typography
               sx={{
-                color: "#d6d9f0",
+                color: background,
                 fontSize: "18px",
                 textAlign: "center",
                 fontFamily: "serif",
@@ -96,7 +95,7 @@ const RegistrationNotice = () => {
 
             <Typography
               sx={{
-                color: "#d6d9f0",
+                color: background,
                 fontSize: "18px",
                 textAlign: "center",
                 fontFamily: "serif",
@@ -107,7 +106,7 @@ const RegistrationNotice = () => {
 
             <Typography
               sx={{
-                color: "#d6d9f0",
+                color: background,
                 fontSize: "18px",
                 textAlign: "center",
                 fontFamily: "serif",
