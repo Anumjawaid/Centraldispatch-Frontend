@@ -9,9 +9,11 @@ import Footer from '../Components/Footer'
 import ShipperInfo from "../Components/Home/ShipperInfo"
 import ContactSupport from "../Components/Home/ContactSection"
 import RegistrationNotice from "../Components/Home/RegistrationNotice"
+import DisclaimerModal from "../Components/Home/DisclaimerModal"
 export const Home = () => {
     return (
         <>
+            <DisclaimerModal />
             <Header />
             {/* <HeroSection /> */}
             <MainHeader/>
