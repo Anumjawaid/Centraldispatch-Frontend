@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from './Assets/Logo.png';
 import { useNavigate } from "react-router-dom";
+import {BACKGROUND,SECONDARY,PRIMARY,ACCENT} from '../Constants/Colors'
 const pages = ['Solutions', 'Features', 'Intelligence', "About Us"];
 
 function Header() {
@@ -37,13 +38,13 @@ function Header() {
 
     return (
 
-        <AppBar position="static" sx={{ backgroundColor: "#202C58" }}>
+        <AppBar position="static" sx={{ backgroundColor: BACKGROUND }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters sx={{ display: "flex", justifyContent: "space-between" }}>
 
                     {/* Left: Logo */}
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <img src={Logo} width="150px" height="100px" alt="logo" />
+                        <img src={Logo} width="100px" height="100px" alt="logo" />
                     </Box>
 
                     {/* Center: Pages */}
@@ -52,7 +53,7 @@ function Header() {
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: "#B79F04", display: "block" }}
+                                sx={{ my: 2, color: PRIMARY, display: "block" }}
                             >
                                 {page}
                             </Button>
@@ -61,10 +62,10 @@ function Header() {
 
                     {/* Right: Extra Buttons */}
                     <Box sx={{ display: "flex", gap: 2 }}>
-                        <Button variant="contained" color="secondary" onClick={() => navigate("/login")} sx={{ backgroundColor: "#B79F04" }}>
+                        <Button variant="contained" color="secondary" onClick={() => navigate("/login")} sx={{ backgroundColor: PRIMARY }}>
                             Login
                         </Button>
-                        <Button variant="outlined" onClick={() => navigate("/register")} color="inherit">
+                        <Button variant="outlined" sx={{ backgroundColor: SECONDARY }} onClick={() => navigate("/register")} color="inherit">
                             Sign Up
                         </Button>
                     </Box>
