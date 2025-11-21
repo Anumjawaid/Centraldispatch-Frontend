@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     TextField,
@@ -6,15 +6,26 @@ import {
     Typography,
     MenuItem,
     Paper,
+    CircularProgress,
+    Alert,
 } from "@mui/material";
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { login_user } from '../../Store/authenticationReducer';
 
 export const LoginForm = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { loading, status, message } = useSelector((state) => state.authentication || {});
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         password: "",
-       
     });
+
+    const [error, setError] = useState(null);
 
     const handleChange = (e) => {
         setFormData({
@@ -23,10 +34,35 @@ export const LoginForm = () => {
         });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form Submitted:", formData);
-    };
+        const handleSubmit = (e) => {
+                e.preventDefault();
+                setError(null);
+                // Dispatch login and navigate on success
+                dispatch(login_user(formData))
+                    .then((res) => {
+                        const payload = res.payload || {};
+                        // Support API that returns accessToken and message
+                        const accessToken = payload.accessToken || payload.token || payload.data?.token;
+                        const successMessage = (payload.message || '').toLowerCase().includes('success');
+
+                        if (accessToken || successMessage) {
+                            try {
+                                if (payload.data) localStorage.setItem('user', JSON.stringify(payload.data));
+                                if (accessToken) localStorage.setItem('token', accessToken);
+                                else if (payload.token) localStorage.setItem('token', payload.token);
+                            } catch (err) {
+                                // ignore storage errors
+                            }
+                            navigate('/userdashboard');
+                        } else {
+                            setError(payload.message || 'Unable to login. Please check credentials.');
+                        }
+                    })
+                    .catch((err) => {
+                        setError('Login failed. Please try again later.');
+                        console.error(err);
+                    });
+        };
 
     return (
         <Box
@@ -35,7 +71,6 @@ export const LoginForm = () => {
                 justifyContent: "center",
                 height:'100vh',
                 alignItems: "center",
-                background: "linear-gradient(135deg, #3e4c7c, #5c72a2, #a3bffa)",
             }}
         >
             <Paper
@@ -89,13 +124,15 @@ export const LoginForm = () => {
 
 
                     {/* Submit */}
+                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                     <Button
                         type="submit"
                         variant="contained"
                         fullWidth
                         sx={{ py: 1.2, fontWeight: "bold" }}
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? <CircularProgress size={22} color="inherit" /> : 'Login'}
                     </Button>
                 </form>
             </Paper>

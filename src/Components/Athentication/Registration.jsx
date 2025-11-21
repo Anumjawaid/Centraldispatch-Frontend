@@ -16,6 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { register_user, removeMessage } from "../../Store/authenticationReducer";
+import DisclaimerModal from "../Home/DisclaimerModal";
 
 export const RegistrationForm = () => {
   const dispatch = useDispatch();
@@ -43,6 +44,9 @@ export const RegistrationForm = () => {
   });
 
   const [openModal, setOpenModal] = useState(false);
+  // used to open the disclaimer when user hits submit
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,7 +54,9 @@ export const RegistrationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(register_user(formData));
+    // instead of submitting immediately, open the disclaimer modal
+    setPendingFormData(formData);
+    setShowDisclaimer(true);
   };
 
  useEffect(() => {
@@ -68,6 +74,20 @@ export const RegistrationForm = () => {
   const handleClose = () => {
     setOpenModal(false);
     navigate("/userdashboard");
+  };
+
+  const handleDisclaimerAgree = () => {
+    // user agreed — submit stored form data
+    if (pendingFormData) {
+      dispatch(register_user(pendingFormData));
+      setPendingFormData(null);
+    }
+    setShowDisclaimer(false);
+  };
+
+  const handleDisclaimerClose = () => {
+    // user closed without agreeing — just close the disclaimer
+    setShowDisclaimer(false);
   };
 
   return (
@@ -258,6 +278,8 @@ export const RegistrationForm = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Disclaimer modal used on-demand when user submits */}
+      <DisclaimerModal controlledOpen={showDisclaimer} onAgree={handleDisclaimerAgree} onClose={handleDisclaimerClose} />
     </Box>
   );
 };

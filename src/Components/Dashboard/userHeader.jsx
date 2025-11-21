@@ -8,19 +8,25 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import Button from '@mui/material/Button';
 import Logo from '../Assets/Logo.png'
 import { HeaderBackground } from '../../Constants/Colors';
+import { useNavigate } from 'react-router-dom';
 
 const pages = ['Products', 'Pricing', 'Blog'];
-const settings = [{ name: 'Account', link: "/userdashboard1" }, { name: 'Add Listing', link: "/addposts" }, { name: 'Logout', link: "/" }];
+const settings = [
+    { name: 'Account', link: "/userdashboard1" },
+    { name: 'Add Listing', link: "/addposts" },
+    { name: 'Logout', action: 'logout' },
+];
 
-function UserHeader() {
+function UserHeader({ onLogout }) {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const navigate = useNavigate();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -33,8 +39,16 @@ function UserHeader() {
         setAnchorElNav(null);
     };
 
-    const handleCloseUserMenu = () => {
+    const handleCloseUserMenu = (setting) => {
         setAnchorElUser(null);
+        if (!setting) return;
+        if (setting.action === 'logout') {
+            if (typeof onLogout === 'function') onLogout();
+            return;
+        }
+        if (setting.link) {
+            navigate(setting.link);
+        }
     };
 
     return (
@@ -103,10 +117,10 @@ function UserHeader() {
                                 horizontal: 'right',
                             }}
                             open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
+                            onClose={() => handleCloseUserMenu(null)}
                         >
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={()=>handleCloseUserMenu(setting.link)}>
+                                <MenuItem key={setting.name} onClick={()=>handleCloseUserMenu(setting)}>
                                     <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
                                 </MenuItem>
                             ))}

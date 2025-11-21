@@ -9,10 +9,28 @@ import { Link } from 'react-router-dom';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { background,Dashboardbackground ,primaryColor} from '../../Constants/Colors';
+import { background,Dashboardbackground ,primaryColor, HeaderBackground } from '../../Constants/Colors';
+import UserHeader from './userHeader';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Button from '@mui/material/Button';
 
 
 export default function DashboardContainer() {
+  const navigate = useNavigate();
+  const auth = useSelector((state) => state.authentication || {});
+  const postsState = useSelector((state) => state.posts || {});
+
+  const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+  const token = auth.token || localStorage.getItem('token');
+  const isLoggedIn = Boolean(user || token);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    // redirect to login
+    navigate('/login');
+  };
   // 🧩 Styled card component
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: background,
@@ -38,57 +56,92 @@ export default function DashboardContainer() {
   const cards = [
     {
       icon: <ViewInArIcon sx={{ fontSize: 50, mb: 1,color:primaryColor}} />,
-      name: 'View Listings',
+      name: 'Active Listings',
       link: '/allListings',
-      helper: 'No active listing ATM',
+      helper: 'Your current active listings',
     },
     {
       icon: <DashboardIcon sx={{ fontSize: 50, mb: 1,color:primaryColor }} />,
-      name: 'Add Listings',
+      name: 'Create Post',
       link: '/addposts',
-      helper: 'Add Listings From Here',
+      helper: 'Create a new shipment post',
     },
     {
-      icon: <SettingsIcon sx={{ fontSize: 50, mb: 1,color:primaryColor }} />,
-      name: 'Settings',
-      link: '/settings',
-      helper: 'Manage your account',
+      icon: <ViewInArIcon sx={{ fontSize: 50, mb: 1,color:primaryColor }} />,
+      name: 'View Listings',
+      link: '/allListings',
+      helper: 'View all available listings',
     },
   ];
 
   return (
-    <React.Fragment sx={{backgroundColor:Dashboardbackground}}>
-        
+    <React.Fragment>
       <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          margin:'50px',
-          px: 4,
-        }}
-      >
-        <Grid container spacing={4} justifyContent="center" maxWidth="lg">
-          {cards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Link
-                to={card.link}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <Item>
-                  {card.icon}
-                  <Typography variant="h6" gutterBottom>
-                    {card.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {card.helper}
-                  </Typography>
-                </Item>
-              </Link>
+      <Box sx={{ backgroundColor: Dashboardbackground, minHeight: '100vh' }}>
+        {/* show user header when logged in */}
+        {isLoggedIn && <UserHeader onLogout={handleLogout} />}
+
+        {/* Hero / Title */}
+        <Box sx={{ pt: 6, pb: 2, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: primaryColor, fontFamily: 'serif' }}>
+            Dashboard
+          </Typography>
+          <Typography variant="subtitle1" sx={{ color: '#47547a', mt: 1 }}>
+            Quick actions and overview of your account
+          </Typography>
+          {isLoggedIn && (
+            <Typography variant="body1" sx={{ color: '#374151', mt: 1 }}>
+              Welcome back, {user?.name || user?.email || 'User'}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Cards row */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', px: 4, pb: 8 }}>
+          <Grid container spacing={4} justifyContent="center" alignItems="stretch" maxWidth="lg">
+            {cards.map((card, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Link to={card.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Item>
+                    {card.icon}
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
+                      {card.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#6b7280', mb: 2 }}>
+                      {card.helper}
+                    </Typography>
+                    <Box sx={{ mt: 'auto', width: '100%' }}>
+                      <Button variant="contained" sx={{ backgroundColor: primaryColor, color: '#fff', width: '100%' }}>
+                        Open
+                      </Button>
+                    </Box>
+                  </Item>
+                </Link>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+        {/* User's posts summary */}
+        {isLoggedIn && (
+          <Box sx={{ px: 4, pb: 8 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>Your Listings</Typography>
+            <Grid container spacing={2}>
+              {(postsState.posts || []).slice(0,3).map((post, i) => (
+                <Grid item xs={12} md={4} key={i}>
+                  <Paper sx={{ p:2, borderRadius: 2 }}>
+                    <Typography sx={{ fontWeight: 700 }}>{post.title || post.trailerType || 'Shipment'}</Typography>
+                    <Typography variant="body2" sx={{ color: '#6b7280' }}>{post.price ? `$${post.price}` : ''}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
+              {(!postsState.posts || postsState.posts.length === 0) && (
+                <Grid item xs={12}>
+                  <Typography variant="body2" sx={{ color: '#6b7280' }}>No listings found. Create your first post from Create Post.</Typography>
+                </Grid>
+              )}
             </Grid>
-          ))}
-        </Grid>
+          </Box>
+        )}
       </Box>
     </React.Fragment>
   );

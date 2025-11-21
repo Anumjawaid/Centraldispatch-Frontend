@@ -16,20 +16,46 @@ const style = {
   outline: "none",
 };
 
-const DisclaimerModal = () => {
+/**
+ * DisclaimerModal
+ * Props:
+ * - controlledOpen (boolean | undefined): if provided, modal open state is controlled externally
+ * - onAgree (function): called when user agrees
+ * - onClose (function): called when modal is closed
+ * If controlledOpen is not provided, the modal will auto-open once for first-time visitors (based on localStorage), preserving previous behavior.
+ */
+const DisclaimerModal = ({ controlledOpen, onAgree, onClose }) => {
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    if (typeof controlledOpen === "boolean") {
+      setOpen(controlledOpen);
+      return;
+    }
+
     const shown = localStorage.getItem("disclaimer_shown");
     if (!shown) {
       setOpen(true);
     }
-  }, []);
+  }, [controlledOpen]);
+
+  const handleAgree = () => {
+    // if parent provided a handler, call it
+    if (typeof onAgree === "function") {
+      onAgree();
+    } else {
+      // default behavior: mark shown and close
+      localStorage.setItem("disclaimer_shown", "true");
+      setOpen(false);
+      if (typeof onClose === "function") onClose();
+    }
+  };
 
   const handleClose = () => {
-    localStorage.setItem("disclaimer_shown", "true");
+    // closing without agree does not mark the disclaimer as shown
     setOpen(false);
+    if (typeof onClose === "function") onClose();
   };
 
   return (
@@ -58,7 +84,7 @@ const DisclaimerModal = () => {
           variant="contained"
           color="primary"
           disabled={!checked}
-          onClick={handleClose}
+          onClick={handleAgree}
           sx={{ backgroundColor: PRIMARY, color: SECONDARY, fontWeight: "bold", fontFamily: "serif" }}
         >
           I Agree

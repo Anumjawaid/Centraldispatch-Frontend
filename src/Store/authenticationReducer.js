@@ -19,6 +19,8 @@ let initialState = {
     loading: false,
     status: "",
     message: "",
+    user: null,
+    token: null,
 }
 
 export const register_user = createAsyncThunk(
@@ -44,7 +46,7 @@ export const login_user = createAsyncThunk(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         };
-        const res = await fetch(REGISTRATION, requestOptions)
+        const res = await fetch(LOGIN, requestOptions)
         return res.json();
     }
 )
@@ -86,14 +88,18 @@ export const authSlice = createSlice({
         })
         builder.addCase(login_user.fulfilled, (state, action) => {
             console.log("Fullfilled", action.payload)
-            if (action.payload.data == undefined) {
-                // 
-                state.message = "Unable To Process Request Atm,Try Again Later"
-                state.status = 'rejected'
-            }
-            else {
-                state.message = action.payload.message
-                state.status = 'fullfilled'
+            const payload = action.payload || {};
+            // try to extract token and user
+            const accessToken = payload.accessToken || payload.token || payload.data?.token;
+            const user = payload.data || null;
+            if (!accessToken && !payload.message) {
+                state.message = "Unable To Process Request Atm,Try Again Later";
+                state.status = 'rejected';
+            } else {
+                state.token = accessToken || null;
+                state.user = user;
+                state.message = payload.message || "Successfully logged in";
+                state.status = 'fulfilled';
             }
 
         })
