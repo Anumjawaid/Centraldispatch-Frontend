@@ -90,14 +90,13 @@ export const authSlice = createSlice({
             console.log("Fullfilled", action.payload)
             const payload = action.payload || {};
             // try to extract token and user
-            const accessToken = payload.accessToken || payload.token || payload.data?.token;
-            const user = payload.data || null;
+            const accessToken = payload.accessToken
             if (!accessToken && !payload.message) {
                 state.message = "Unable To Process Request Atm,Try Again Later";
                 state.status = 'rejected';
             } else {
                 state.token = accessToken || null;
-                state.user = user;
+                console.log(accessToken,"accessToken in reducer");
                 state.message = payload.message || "Successfully logged in";
                 state.status = 'fulfilled';
             }

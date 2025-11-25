@@ -42,7 +42,7 @@ export const LoginForm = () => {
                     .then((res) => {
                         const payload = res.payload || {};
                         // Support API that returns accessToken and message
-                        const accessToken = payload.accessToken || payload.token || payload.data?.token;
+                        const accessToken = payload.accessToken 
                         const successMessage = (payload.message || '').toLowerCase().includes('success');
 
                         if (accessToken || successMessage) {

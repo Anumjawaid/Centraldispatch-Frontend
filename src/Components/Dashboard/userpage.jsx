@@ -14,14 +14,17 @@ import UserHeader from './userHeader';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
+
 export default function UserDashboard() {
 
    const navigate = useNavigate();
      const auth = useSelector((state) => state.authentication || {});
+     console.log(auth, "auth in dashboard");
      const postsState = useSelector((state) => state.posts || {});
    
      const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
      const token = auth.token || localStorage.getItem('token');
+     console.log(token, "token in dashboard");
      const isLoggedIn = Boolean(user || token);
    
      const handleLogout = () => {
@@ -91,7 +94,7 @@ export default function UserDashboard() {
              </Typography>
              {isLoggedIn && (
                <Typography variant="body1" sx={{ color: '#374151', mt: 1 }}>
-                 Welcome back, {user?.name || user?.email || 'User'}
+                 Welcome back, {'User'}
                </Typography>
              )}
             {/* Quick link to Filter/Search page */}
