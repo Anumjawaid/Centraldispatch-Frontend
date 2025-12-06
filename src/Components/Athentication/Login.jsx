@@ -20,7 +20,6 @@ export const LoginForm = () => {
     const { loading, status, message } = useSelector((state) => state.authentication || {});
 
     const [formData, setFormData] = useState({
-        name: "",
         email: "",
         password: "",
     });
@@ -87,15 +86,7 @@ export const LoginForm = () => {
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Full Name */}
-                    <TextField
-                        fullWidth
-                        label="Full Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        sx={{ mb: 2 }}
-                    />
+                   
 
                     {/* Email + Confirm Email */}
                     <Box sx={{ display: "flex", gap: 2, mb: 2 }}>

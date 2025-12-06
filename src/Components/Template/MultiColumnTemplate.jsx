@@ -36,7 +36,7 @@ const MultiColumnTemplate = ({ imageSrc, heading, subheading, rightComponent, ex
             )}
           </Box>
           {/* Right Column: Custom Component */}
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', px: 4 }}>
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', px: 4, overflowY: 'auto', minHeight: 0 }}>
             {rightComponent}
           </Box>
         </Box>

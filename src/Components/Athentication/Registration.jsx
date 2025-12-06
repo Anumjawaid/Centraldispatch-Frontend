@@ -73,7 +73,7 @@ export const RegistrationForm = () => {
 
   const handleClose = () => {
     setOpenModal(false);
-    navigate("/userdashboard");
+    navigate("/login");
   };
 
   const handleDisclaimerAgree = () => {
@@ -168,7 +168,7 @@ export const RegistrationForm = () => {
             onChange={handleChange}
             sx={{ mb: 2 }}
           >
-            {["Retail", "Wholesale", "Services"].map((type) => (
+            {["Retail", "Shipper", "Broker"].map((type) => (
               <MenuItem key={type} value={type}>
                 {type}
               </MenuItem>

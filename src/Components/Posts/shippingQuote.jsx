@@ -90,21 +90,7 @@ const ShippingQuoteForm = () => {
   };
 
   return (
-    <React.Fragment>
-       <UserHeader/>
-
-    <Box
-      sx={{
-        height: "100vh",
-        overflowY: "auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        background: "linear-gradient(135deg, #3e4c7c, #5c72a2, #a3bffa)",
-        py: 4,
-      }}
-    >
-      <Paper elevation={6} sx={{ p: 4, maxWidth: 1000, width: "100%", borderRadius: 3 }}>
+    <Paper elevation={6} sx={{ p: 4, maxWidth: "100%", width: "100%", borderRadius: 3, maxHeight: "90vh", overflowY: "auto" }}>
         <Typography variant="h5" align="center" gutterBottom>
           Shipping Quote Form
         </Typography>
@@ -367,9 +353,7 @@ const ShippingQuoteForm = () => {
             Submit Quote
           </Button>
         </form>
-      </Paper>
-    </Box>
-    </React.Fragment>
+    </Paper>
   );
 };
 
