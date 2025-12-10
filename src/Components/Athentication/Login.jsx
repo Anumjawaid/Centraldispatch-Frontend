@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login_user } from '../../Store/authenticationReducer';
+import { connectSocket, disconnectSocket, emitSocketEvent, socket } from '../../utils/socketClient';
 
 export const LoginForm = () => {
     const dispatch = useDispatch();
@@ -44,12 +45,13 @@ export const LoginForm = () => {
                         // Support API that returns accessToken and message
                         const accessToken = payload.accessToken || payload.token || payload.data?.token;
                         const successMessage = (payload.message || '').toLowerCase().includes('success');
-
+                        console.log('Login response payload:', payload);    
                         if (accessToken || successMessage) {
                             try {
-                                if (payload.data) localStorage.setItem('user', JSON.stringify(payload.data));
+                                if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
                                 if (accessToken) localStorage.setItem('token', accessToken);
                                 else if (payload.token) localStorage.setItem('token', payload.token);
+                                connectSocket();
                             } catch (err) {
                                 // ignore storage errors
                             }
@@ -61,6 +63,7 @@ export const LoginForm = () => {
                     .catch((err) => {
                         setError('Login failed. Please try again later.');
                         console.error(err);
+                        disconnectSocket();
                     });
         };
 

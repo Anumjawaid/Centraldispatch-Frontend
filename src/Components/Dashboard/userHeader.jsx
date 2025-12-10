@@ -102,6 +102,7 @@ function UserHeader({ onLogout }) {
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 👋
                             </IconButton>
+                            
                         </Tooltip>
                         <Menu
                             sx={{ mt: '45px' }}

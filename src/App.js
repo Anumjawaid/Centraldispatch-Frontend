@@ -1,8 +1,12 @@
 import { AppRouter } from "./Router";
+import SocketBootstrap from "./SocketBootstrap";
 
 function App() {
   return (
-    <AppRouter />
+    <>
+      <SocketBootstrap />
+      <AppRouter />
+    </>
   );
 }
 

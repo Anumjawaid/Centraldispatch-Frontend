@@ -11,6 +11,7 @@ import UserView from '../Components/Dashboard/userDashboard';
 import AllListings from '../Components/Posts/AllListings';
 import RegistrationPage from '../Pages/Registration';
 import FilterSidebar from '../Components/Posts/FilterSidebar';
+import ChatPage from '../Pages/ChatPage';
 
 export function AppRouter() {
     return (
@@ -25,6 +26,7 @@ export function AppRouter() {
                     <Route path="/userdashboard1" element={<UserView/>}></Route>
                     <Route path="/allListings" element={<AllListings/>}></Route>
                     <Route path="/filterSidebar" element={<FilterSidebar/>}></Route>
+                    <Route path="/chat" element={<ChatPage/>}></Route>
                 </Routes>
             </Router>
         </>

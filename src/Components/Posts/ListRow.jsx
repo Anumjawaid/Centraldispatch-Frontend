@@ -5,8 +5,9 @@ import { background } from '../../Constants/Colors';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
-export default function QuoteListRow({ data, onEdit, onDelete, onView }) {
+export default function QuoteListRow({ data, onEdit, onDelete, onView, onChat }) {
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: background,
     padding: theme.spacing(2),
@@ -28,7 +29,7 @@ export default function QuoteListRow({ data, onEdit, onDelete, onView }) {
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing(1),
-    width: '120px', // Fixed width for button column
+    width: '140px', // Fixed width for button column
   }));
 
   const ContentBox = styled(Box)(({ theme }) => ({
@@ -90,6 +91,15 @@ export default function QuoteListRow({ data, onEdit, onDelete, onView }) {
           onClick={() => onView(data)}
         >
           View
+        </Button>
+        <Button
+          variant="contained"
+          size="small"
+          color="primary"
+          startIcon={<ChatBubbleOutlineIcon />}
+          onClick={() => onChat && onChat(data)}
+        >
+          Chat
         </Button>
         <Button
           variant="outlined"

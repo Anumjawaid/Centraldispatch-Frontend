@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsIcon from '@mui/icons-material/Settings';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { background,Dashboardbackground ,primaryColor, HeaderBackground } from '../../Constants/Colors';
 import UserHeader from './userHeader';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,9 @@ import { useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 export default function UserDashboard() {
 
+    React.useEffect(()=>{
+        console.log("User Dashboard - Central Dispatch");
+    },[])
    const navigate = useNavigate();
      const auth = useSelector((state) => state.authentication || {});
      const postsState = useSelector((state) => state.posts || {});
@@ -70,6 +73,12 @@ export default function UserDashboard() {
          name: 'View Listings',
          link: '/allListings',
          helper: 'View all available listings',
+       },
+       {
+         icon: <ChatBubbleOutlineIcon sx={{ fontSize: 50, mb: 1, color: primaryColor }} />,
+         name: 'Chat',
+         link: '/chat',
+         helper: 'Message shippers and carriers',
        },
      ];
   
