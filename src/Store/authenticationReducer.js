@@ -37,9 +37,12 @@ export const register_user = createAsyncThunk(
 )
 // Get My Info 
 export const get_mydetails = createAsyncThunk(
-    "posts/get_posts",
+    "get_my_info",
     async (params = {}, thunkApi) => {
         try {
+             const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log("Token:", token);
             // Build query string dynamically
             const queryString = new URLSearchParams(
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
@@ -50,7 +53,10 @@ export const get_mydetails = createAsyncThunk(
 
             const res = await fetch(url, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
             });
 
             if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);

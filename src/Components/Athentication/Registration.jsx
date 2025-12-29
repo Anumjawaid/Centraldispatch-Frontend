@@ -11,14 +11,24 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Container,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
   Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { register_user, removeMessage } from "../../Store/authenticationReducer";
 import DisclaimerModal from "../Home/DisclaimerModal";
+import { useNavigate } from 'react-router-dom';
+import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Logistics from "../../Components/Assets/Logistics.gif";
 
-export const RegistrationForm = () => {
+export default function SignupPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -54,22 +64,26 @@ export const RegistrationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (formData.email !== formData.confirmEmail) {
+      alert('Emails do not match!');
+      return;
+    }
     // instead of submitting immediately, open the disclaimer modal
     setPendingFormData(formData);
     setShowDisclaimer(true);
   };
 
- useEffect(() => {
-  console.log(status, message, "status after");
-  if (
-    status === "fulfilled" &&
-    message?.toLowerCase().includes("user created successfully")
-  ) {
-    console.log("Opening modal...");
-    setOpenModal(true);
-    dispatch(removeMessage());
-  }
-}, [status, message, dispatch]);
+  useEffect(() => {
+    console.log(status, message, "status after");
+    if (
+      status === "fulfilled" &&
+      message?.toLowerCase().includes("user created successfully")
+    ) {
+      console.log("Opening modal...");
+      setOpenModal(true);
+      dispatch(removeMessage());
+    }
+  }, [status, message, dispatch]);
 
   const handleClose = () => {
     setOpenModal(false);
@@ -90,181 +104,314 @@ export const RegistrationForm = () => {
     setShowDisclaimer(false);
   };
 
+
+
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #3e4c7c, #5c72a2, #a3bffa)",
-        minHeight: "100vh",
-      }}
-    >
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          maxWidth: 600,
-          width: "100%",
-          borderRadius: 3,
-          position: "relative",
-        }}
-      >
-        <Typography variant="h5" align="center" gutterBottom>
-          Registration
-        </Typography>
-
-        {status === "rejected" && message && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {message}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Full Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <TextField
-              fullWidth
-              type="email"
-              label="Email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              type="email"
-              label="Confirm Email"
-              name="confirmEmail"
-              value={formData.confirmEmail}
-              onChange={handleChange}
-            />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
+      <Grid container sx={{ flex: 1 }}>
+        {/* Left side - Branding */}
+        <Grid
+          item
+          xs={12}
+          md={5}
+          sx={{
+            bgcolor: 'primary.main',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 4,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ textAlign: 'center', color: 'white', zIndex: 1, maxWidth: 500 }}>
+            <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
+              Join Our Platform
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 4, opacity: 0.95, lineHeight: 1.6 }}>
+              Connect with thousands of shippers and carriers nationwide
+            </Typography>
+            <Box
+              sx={{
+                width: '100%',
+                maxWidth: 450,
+                height: 450,
+                bgcolor: 'rgba(255,255,255,0.1)',
+                borderRadius: 3,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(10px)',
+                mb: 3,
+                mx: 'auto',
+                overflow: 'hidden', // important
+              }}
+            >
+              <Box
+                component="img"
+                src={Logistics}
+                alt="Shipping Animation"
+                sx={{
+                  width: '50%',
+                  height: '5d0%',
+                  objectFit: 'fit', // fills the box
+                  borderRadius: 3,
+                }}
+              />
+            </Box>
           </Box>
+        </Grid>
 
-          <TextField
-            fullWidth
-            type="password"
-            label="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
+        {/* Right side - Form */}
+        <Grid
+          item
+          xs={12}
+          md={7}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: 'white',
+            overflowY: 'auto',
+            maxHeight: '100vh',
+          }}
+        >
+          <Container maxWidth="md" sx={{ py: 6 }}>
+            <Box sx={{ mb: 5, textAlign: 'center' }}>
+              <Typography
+                variant="h2"
+                gutterBottom
+                color="primary"
+                sx={{ fontWeight: 700, mb: 1 }}
+              >
+                Registration
+              </Typography>
+              <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+                Create Your Account
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Fill in your details below to get started
+              </Typography>
+            </Box>
 
-          <TextField
-            select
-            fullWidth
-            label="Business Type"
-            name="businessType"
-            value={formData.businessType}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          >
-            {["Retail", "Shipper", "Broker"].map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </TextField>
+            <form onSubmit={handleSubmit}>
+              {/* Personal Information */}
+              <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <PersonIcon sx={{ color: 'primary.main', mr: 1 }} />
+                  <Typography variant="h6" color="primary">
+                    Personal Information
+                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Full Name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Business Phone"
+                      name="businessPhone"
+                      type="tel"
+                      value={formData.businessPhone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Email Address"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Confirm Email"
+                      name="confirmEmail"
+                      type="email"
+                      value={formData.confirmEmail}
+                      onChange={handleChange}
+                      required
+                      error={formData.confirmEmail !== '' && formData.email !== formData.confirmEmail}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Password"
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth required>
+                      <InputLabel>Business Type</InputLabel>
+                      <Select
+                        name="businessType"
+                        value={formData.businessType}
+                        onChange={handleChange}
+                        label="Business Type"
+                      >
+                        <MenuItem value="shipper">Shipper</MenuItem>
+                        <MenuItem value="carrier">Carrier</MenuItem>
+                        <MenuItem value="transporter">Transporter</MenuItem>
+                        <MenuItem value="both">Both Shipper & Carrier</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Paper>
 
-          <TextField
-            fullWidth
-            label="Company Legal Name"
-            name="companyLegalName"
-            value={formData.companyLegalName}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
+              {/* Company Information */}
+              <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <BusinessIcon sx={{ color: 'primary.main', mr: 1 }} />
+                  <Typography variant="h6" color="primary">
+                    Company Information
+                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Company Legal Name"
+                      name="companyLegalName"
+                      value={formData.companyLegalName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Company Address"
+                      name="companyAddress"
+                      value={formData.companyAddress}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="City"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="State/Province"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Zip Code"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Country"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
 
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <TextField
-              fullWidth
-              label="Country"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="State"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="City"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="Zip Code"
-              name="zipCode"
-              value={formData.zipCode}
-              onChange={handleChange}
-            />
-          </Box>
+              {/* Operation Hours */}
+              <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <AccessTimeIcon sx={{ color: 'primary.main', mr: 1 }} />
+                  <Typography variant="h6" color="primary">
+                    Operation Hours
+                  </Typography>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Opening Time"
+                      name="operationHoursStart"
+                      type="time"
+                      value={formData.operationHoursStart}
+                      onChange={handleChange}
+                      InputLabelProps={{ shrink: true }}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Closing Time"
+                      name="operationHoursEnd"
+                      type="time"
+                      value={formData.operationHoursEnd}
+                      onChange={handleChange}
+                      InputLabelProps={{ shrink: true }}
+                      required
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
 
-          <TextField
-            fullWidth
-            label="Company Address"
-            name="companyAddress"
-            value={formData.companyAddress}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
+              {/* Submit Button */}
 
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <TextField
-              fullWidth
-              type="time"
-              label="Start Hours"
-              name="operationHoursStart"
-              value={formData.operationHoursStart}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              fullWidth
-              type="time"
-              label="End Hours"
-              name="operationHoursEnd"
-              value={formData.operationHoursEnd}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Box>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                size="large"
+                sx={{ py: 1.5, mb: 2 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Register"}
+              </Button>
 
-          <TextField
-            fullWidth
-            label="Business Phone"
-            name="businessPhone"
-            value={formData.businessPhone}
-            onChange={handleChange}
-            sx={{ mb: 3 }}
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ py: 1.2, fontWeight: "bold" }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Register"}
-          </Button>
-        </form>
-      </Paper>
+              <Typography variant="body2" align="center" color="text.secondary">
+                Already have an account?{' '}
+                <Button
+                  onClick={() => navigate('/login')}
+                  sx={{ textTransform: 'none', p: 0 }}
+                >
+                  Login here
+                </Button>
+              </Typography>
+            </form>
+          </Container>
+        </Grid>
+      </Grid>
 
       {/* ✅ Success Modal */}
       <Dialog open={openModal} onClose={handleClose}>
@@ -282,4 +429,4 @@ export const RegistrationForm = () => {
       <DisclaimerModal controlledOpen={showDisclaimer} onAgree={handleDisclaimerAgree} onClose={handleDisclaimerClose} />
     </Box>
   );
-};
+}

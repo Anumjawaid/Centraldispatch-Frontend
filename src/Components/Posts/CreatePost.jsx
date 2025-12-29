@@ -76,7 +76,7 @@ export default function CreatePost({ currentUser }) {
         },
 
         // Vehicle Information
-        vehicle: {
+        vehicles: {
             vinAvailable: 'yes',
             vin: '',
             type: '',
@@ -100,6 +100,8 @@ export default function CreatePost({ currentUser }) {
 
     const handleChange = (e, section, field, index) => {
         const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+        console.log(e.target.value,"value in here")
+        console.log(e.target.name,"name in here")
         let targetSection, targetField;
         if (section && field) {
             targetSection = section;
@@ -112,8 +114,8 @@ export default function CreatePost({ currentUser }) {
             } else if (name.startsWith("delivery")) {
                 targetSection = "deliveryLocation";
                 targetField = name.replace("delivery", "").charAt(0).toLowerCase() + name.replace("delivery", "").slice(1);
-            } else if (name.startsWith("vehicle")) {
-                targetSection = "vehicle";
+            } else if (name.startsWith("vehicles")) {
+                targetSection = "vehicles";
                 targetField = name.replace("vehicle", "").charAt(0).toLowerCase() + name.replace("vehicle", "").slice(1);
             } else {
                 targetSection = null;
@@ -122,9 +124,10 @@ export default function CreatePost({ currentUser }) {
         }
         if (targetSection) {
             if (targetSection === "vehicles") {
-                const updatedVehicles = [...formData.vehicles];
-                updatedVehicles[index][targetField] = value;
-                setFormData({ ...formData, vehicles: updatedVehicles });
+                setFormData({
+                    ...formData,
+                    vehicles: { ...formData.vehicless, [targetField]: value },
+                });
             } else {
                 setFormData({
                     ...formData,
@@ -150,6 +153,7 @@ export default function CreatePost({ currentUser }) {
         e.preventDefault();
         setApiError("");
         setApiMessage("");
+        console.log(formData,"formData")
 
         // Validate required fields
         if (!formData.agreedToTerms) {
@@ -211,26 +215,8 @@ export default function CreatePost({ currentUser }) {
                     buyerReferenceNumber: "",
                     twicRequired: false,
                 },
-                vehicles: [
-                    {
-                        vinAvailable: false,
-                        vin: "",
-                        type: "",
-                        year: "",
-                        make: "",
-                        model: "",
-                        color: "",
-                        lotNumber: "",
-                        licensePlate: "",
-                        licenseStateOrProvince: "",
-                        notes: "",
-                        inoperable: false,
-                        oversized: false,
-                        availableDate: "",
-                        desiredDeliveryDate: "",
-                        expirationDate: "",
-                    },
-                ],
+                vehicles: [formData.vehicles],
+                
             });
         } catch (error) {
             // error is the rejection payload from thunk (string or object)
@@ -297,6 +283,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             required
                                             label="Trailer Type"
+                                            name="trailerType"
                                             sx={{ width: '100%' }}
                                             value={formData.trailerType}
                                             onChange={(e) => handleChange(e, null, "trailerType")}
@@ -671,7 +658,7 @@ export default function CreatePost({ currentUser }) {
                                             <InputLabel>VIN Available?</InputLabel>
                                             <Select
                                                 name="vehicleVinAvailable"
-                                                value={formData.vehicle.vinAvailable}
+                                                value={formData.vehicles.vinAvailable}
                                                 onChange={handleChange}
                                                 label="VIN Available?"
                                             >
@@ -685,10 +672,10 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="VIN (Vehicle Identification Number)"
                                             name="vehicleVin"
-                                            value={formData.vehicle.vin}
-                                            onChange={(e) => handleChange(e, "vehicle", "vehicleVin")}
-                                            disabled={formData.vehicle.vinAvailable === 'no'}
-                                            required={formData.vehicle.vinAvailable === 'yes'}
+                                            value={formData.vehicles.vin}
+                                            onChange={(e) => handleChange(e, "vehicles", "vin")}
+                                            disabled={formData.vehicles.vinAvailable === 'no'}
+                                            required={formData.vehicles.vinAvailable === 'yes'}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -696,7 +683,7 @@ export default function CreatePost({ currentUser }) {
                                             <InputLabel>Vehicle Type</InputLabel>
                                             <Select
                                                 name="vehicleType"
-                                                value={formData.vehicle.type}
+                                                value={formData.vehicles.type}
                                                 onChange={(e) => handleChange(e, "vehicles", "type")}
                                                 label="Vehicle Type"
                                             >
@@ -717,7 +704,7 @@ export default function CreatePost({ currentUser }) {
                                             label="Year"
                                             name="vehicleYear"
                                             type="number"
-                                            value={formData.vehicle.year}
+                                            value={formData.vehicles.year}
                                             onChange={(e) => handleChange(e, "vehicles", "year")}
                                             required
                                         />
@@ -727,7 +714,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="Make"
                                             name="vehicleMake"
-                                            value={formData.vehicle.make}
+                                            value={formData.vehicles.make}
                                             onChange={(e) => handleChange(e, "vehicles", "make")}
                                             required
                                         />
@@ -737,7 +724,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="Model"
                                             name="vehicleModel"
-                                            value={formData.vehicle.model}
+                                            value={formData.vehicles.model}
                                             onChange={(e) => handleChange(e, "vehicles", "model")}
                                             required
                                         />
@@ -747,7 +734,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="Color"
                                             name="vehicleColor"
-                                            value={formData.vehicle.color}
+                                            value={formData.vehicles.color}
                                             onChange={(e) => handleChange(e, "vehicles", "color")}
                                         />
                                     </Grid>
@@ -756,7 +743,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="Lot Number"
                                             name="vehicleLotNumber"
-                                            value={formData.vehicle.lotNumber}
+                                            value={formData.vehicles.lotNumber}
                                             onChange={(e) => handleChange(e, "vehicles", "lotNumber")}
                                         />
                                     </Grid>
@@ -765,7 +752,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="License Plate"
                                             name="vehicleLicensePlate"
-                                            value={formData.vehicle.licensePlate}
+                                            value={formData.vehicles.licensePlate}
                                             onChange={(e) => handleChange(e, "vehicles", "licensePlate")}
                                         />
                                     </Grid>
@@ -774,7 +761,7 @@ export default function CreatePost({ currentUser }) {
                                             fullWidth
                                             label="License State/Province"
                                             name="vehicleLicenseStateOrProvince"
-                                            value={formData.vehicle.licenseStateOrProvince}
+                                            value={formData.vehicles.licenseStateOrProvince}
                                             onChange={(e) => handleChange(e, "vehicles", "licenseStateOrProvince")}
                                         />
                                     </Grid>
@@ -785,7 +772,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleNotes"
                                             multiline
                                             rows={3}
-                                            value={formData.vehicle.notes}
+                                            value={formData.vehicles.notes}
                                             onChange={(e) => handleChange(e, "vehicles", "notes")}
                                             placeholder="Any special notes about the vehicle condition, modifications, etc."
                                         />
@@ -795,7 +782,7 @@ export default function CreatePost({ currentUser }) {
                                             control={
                                                 <Checkbox
                                                     name="vehicleInoperable"
-                                                    checked={formData.vehicle.inoperable}
+                                                    checked={formData.vehicles.inoperable}
                                                     onChange={(e) => handleChange(e, "vehicles", "inoperable")}
                                                 />
                                             }
@@ -807,7 +794,7 @@ export default function CreatePost({ currentUser }) {
                                             control={
                                                 <Checkbox
                                                     name="vehicleOversized"
-                                                    checked={formData.vehicle.oversized}
+                                                    checked={formData.vehicles.oversized}
                                                     onChange={(e) => handleChange(e, "vehicles", "oversized")}
                                                 />
                                             }
@@ -826,7 +813,7 @@ export default function CreatePost({ currentUser }) {
                                             label="Available Date"
                                             name="vehicleAvailableDate"
                                             type="date"
-                                            value={formData.vehicle.availableDate}
+                                            value={formData.vehicles.availableDate}
                                             onChange={(e) => handleChange(e, "vehicle", "availableDate")}
                                             InputLabelProps={{ shrink: true }}
                                             required
@@ -838,7 +825,7 @@ export default function CreatePost({ currentUser }) {
                                             label="Desired Delivery Date"
                                             name="vehicleDesiredDeliveryDate"
                                             type="date"
-                                            value={formData.vehicle.desiredDeliveryDate}
+                                            value={formData.vehicles.desiredDeliveryDate}
                                             onChange={(e) => handleChange(e, "vehicle", "desiredDeliveryDate")}
                                             InputLabelProps={{ shrink: true }}
                                         />
@@ -849,7 +836,7 @@ export default function CreatePost({ currentUser }) {
                                             label="Expiration Date"
                                             name="vehicleExpirationDate"
                                             type="date"
-                                            value={formData.vehicle.expirationDate}
+                                            value={formData.vehicles.expirationDate}
                                             onChange={(e) => handleChange(e, "vehicle", "expirationDate")}
                                             InputLabelProps={{ shrink: true }}
                                             helperText="Date when this listing expires"
@@ -907,10 +894,10 @@ export default function CreatePost({ currentUser }) {
                                                 Vehicle Details
                                             </Typography>
                                             <Typography variant="body2">
-                                                {formData.vehicleYear} {formData.vehicleMake} {formData.vehicleModel}
+                                                {formData.vehiclesYear} {formData.vehiclesMake} {formData.vehiclesModel}
                                             </Typography>
-                                            <Typography variant="body2">Type: {formData.vehicleType}</Typography>
-                                            <Typography variant="body2">Color: {formData.vehicleColor}</Typography>
+                                            <Typography variant="body2">Type: {formData.vehiclesType}</Typography>
+                                            <Typography variant="body2">Color: {formData.vehiclesColor}</Typography>
                                             <Typography variant="body2">VIN: {formData.vin || 'Not provided'}</Typography>
                                             {formData.inoperable && <Typography variant="body2" color="warning.main">⚠️ Vehicle is inoperable</Typography>}
                                             {formData.oversized && <Typography variant="body2" color="warning.main">⚠️ Vehicle is oversized</Typography>}

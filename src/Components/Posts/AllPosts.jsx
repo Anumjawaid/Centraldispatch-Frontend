@@ -27,7 +27,7 @@ export function AllPosts() {
     const navigate = useNavigate();
     const auth = useSelector((state) => state.authentication || {});
     console.log(auth, "auth in dashboard");
-    const postsState = useSelector((state) => state.posts || {});
+    const posts = useSelector((state) => state.posts || {});
 
     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
     const token = auth.token || localStorage.getItem('token');
@@ -37,39 +37,39 @@ export function AllPosts() {
     const [selectedPost, setSelectedPost] = useState(null);
 
 
-    // Mock active posts
-    const [posts] = useState([
-        {
-            id: 1,
-            title: 'Vehicle Transport: Toyota Camry',
-            pickupLocation: 'Los Angeles, CA',
-            deliveryLocation: 'New York, NY',
-            status: 'listing',
-            quotedPrice: 1200,
-            vehicleType: 'Sedan',
-            createdAt: '2024-01-15',
-        },
-        {
-            id: 2,
-            title: 'Vehicle Transport: Ford F-150',
-            pickupLocation: 'Houston, TX',
-            deliveryLocation: 'Miami, FL',
-            status: 'assigned',
-            quotedPrice: 900,
-            vehicleType: 'Pickup Truck',
-            createdAt: '2024-01-18',
-        },
-        {
-            id: 3,
-            title: 'Vehicle Transport: Honda Civic',
-            pickupLocation: 'Seattle, WA',
-            deliveryLocation: 'Denver, CO',
-            status: 'pickedup',
-            quotedPrice: 750,
-            vehicleType: 'Sedan',
-            createdAt: '2024-01-20',
-        },
-    ]);
+    // // Mock active posts
+    // const [posts] = useState([
+    //     {
+    //         id: 1,
+    //         title: 'Vehicle Transport: Toyota Camry',
+    //         pickupLocation: 'Los Angeles, CA',
+    //         deliveryLocation: 'New York, NY',
+    //         status: 'listing',
+    //         quotedPrice: 1200,
+    //         vehicleType: 'Sedan',
+    //         createdAt: '2024-01-15',
+    //     },
+    //     {
+    //         id: 2,
+    //         title: 'Vehicle Transport: Ford F-150',
+    //         pickupLocation: 'Houston, TX',
+    //         deliveryLocation: 'Miami, FL',
+    //         status: 'assigned',
+    //         quotedPrice: 900,
+    //         vehicleType: 'Pickup Truck',
+    //         createdAt: '2024-01-18',
+    //     },
+    //     {
+    //         id: 3,
+    //         title: 'Vehicle Transport: Honda Civic',
+    //         pickupLocation: 'Seattle, WA',
+    //         deliveryLocation: 'Denver, CO',
+    //         status: 'pickedup',
+    //         quotedPrice: 750,
+    //         vehicleType: 'Sedan',
+    //         createdAt: '2024-01-20',
+    //     },
+    // ]);
 
     const handleEdit = (item) => console.log("Edit:", item);
     const handleDelete = (item) => console.log("Delete:", item);

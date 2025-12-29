@@ -1,6 +1,6 @@
 import React from "react";
 import MultiColumnTemplate from "../Components/Template/MultiColumnTemplate";
-import {LoginForm} from "../Components/Athentication/Login";
+import LoginForm from "../Components/Athentication/Login";
 import shipperImg from "../Components/Assets/fullshipper.jpg";
 
 const LoginInfo = (
@@ -15,14 +15,7 @@ const LoginInfo = (
 
 const LoginPage = () => {
   return (
-   <MultiColumnTemplate
-      imageSrc={shipperImg}
-      heading="Login"
-      subheading="Access your account"
-      rightComponent={<LoginForm />}
-      extraInfo={LoginInfo}
-      extraLink={{ url: "/forgot-password", label: "Forgot Password?" }}
-    />
+  <LoginForm />
   );
 };
 
