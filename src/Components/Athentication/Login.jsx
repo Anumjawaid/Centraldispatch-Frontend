@@ -13,7 +13,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login_user } from '../../Store/authenticationReducer';
-import shipperImg from "../../Components/Assets/fullshipper.jpg";
+import Logistics from "../../Components/Assets/Logistics.gif";
 
 
 export default function LoginForm({ onLogin }) {
@@ -102,7 +102,7 @@ export default function LoginForm({ onLogin }) {
                             }}
                         >
                             <img
-                                src={shipperImg}
+                                src={Logistics}
                                 alt="Shipping Animation"
                                 style={{ maxWidth: '100%', maxHeight: '50%', borderRadius: 8 }}
                             />

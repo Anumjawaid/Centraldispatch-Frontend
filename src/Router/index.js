@@ -13,7 +13,7 @@ import AllListings from '../Components/Posts/AllListings';
 import RegistrationPage from '../Pages/Registration';
 import FilterSidebar from '../Components/Posts/FilterSidebar';
 import Dashboard from '../Components/Dashboard/userDashboard';
-import {AllPosts} from '../Components/Posts/AllPosts';
+import AllPosts from '../Components/Posts/AllPosts';
 import ProfileSettings from '../Components/Dashboard/ProfileSettings';
 
 export function AppRouter() {

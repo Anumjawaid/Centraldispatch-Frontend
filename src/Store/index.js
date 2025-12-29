@@ -10,7 +10,7 @@ export const Store=configureStore({   //setup and configure Store
     reducer:{
         // define whatever you want to define here 
         authentication:authSlice.reducer,
-        posts: postsSlice.reducer,
+        posts: postsSlice,
         
 
     }

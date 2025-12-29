@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
     Box,
     Container,
@@ -18,23 +18,35 @@ import ChatIcon from '@mui/icons-material/Chat';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import { useSelector } from 'react-redux';
 import ChatScreen from '../Chat/ChatScreen';
+import { get_posts } from '../../Store/postReducer';
+import { useSelector, useDispatch } from 'react-redux';
 
 
 
-export function AllPosts() {
+export default function AllPosts() {
     const navigate = useNavigate();
+
+    const postsState = useSelector((state) => state.posts || {});
+    console.log(postsState, "posts in all posts");
+    const posts = postsState.posts.rows || [];
     const auth = useSelector((state) => state.authentication || {});
-    console.log(auth, "auth in dashboard");
-    const posts = useSelector((state) => state.posts || {});
+    const dispatch = useDispatch();
+    // console.log(auth, "auth in dashboard");
 
     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
     const token = auth.token || localStorage.getItem('token');
-    console.log(token, "token in dashboard");
+    // console.log(token, "token in dashboard");
     const isLoggedIn = Boolean(user || token);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedPost, setSelectedPost] = useState(null);
+    useEffect(() => {
+        // Fetch user profile if logged in and user data is not present
+        if (isLoggedIn && !user) {
+        }
+        console.log("Dispatching get_posts");
+        dispatch(get_posts());
+    }, [isLoggedIn, user, dispatch]);
 
 
     // // Mock active posts

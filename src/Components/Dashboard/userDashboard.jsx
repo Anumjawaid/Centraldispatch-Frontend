@@ -18,8 +18,9 @@ import AddIcon from '@mui/icons-material/Add';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import {get_posts} from '../../Store/postReducer';
-import { useSelector,useDispatch } from 'react-redux';
+import { get_posts } from '../../Store/postReducer';
+import { useSelector, useDispatch } from 'react-redux';
+import AllPosts from '../Posts/AllPosts';
 
 
 export default function Dashboard({ currentUser, onLogout }) {
@@ -57,7 +58,7 @@ export default function Dashboard({ currentUser, onLogout }) {
     }, [isLoggedIn, user, dispatch]);
 
 
-   
+
 
     const handleMenuOpen = (event, postId) => {
         setAnchorEl(event.currentTarget);
@@ -69,7 +70,7 @@ export default function Dashboard({ currentUser, onLogout }) {
         setSelectedPost(null);
     };
 
-    
+
     const handleChatDriver = (post) => {
         setSelectedDriver({
             name: post.driver || 'Available Driver',
@@ -203,6 +204,7 @@ export default function Dashboard({ currentUser, onLogout }) {
                             </CardContent>
                         </Card>
                     </Grid>
+                    <AllPosts />
                 </Grid>
             </Container>
 
