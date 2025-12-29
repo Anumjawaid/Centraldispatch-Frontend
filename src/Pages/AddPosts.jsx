@@ -3,6 +3,7 @@ import MultiColumnTemplate from "../Components/Template/MultiColumnTemplate";
 import shipperImg from "../Components/Assets/fullshipper.jpg";
 import ShippingQuoteForm from "../Components/Posts/shippingQuote";
 import UserHeader from "../Components/Dashboard/userHeader";
+import CreatePost from "../Components/Posts/CreatePost";
 
 const ShippingForm = (
     <div style={{ background: '#FDF8ED', borderRadius: 12, padding: 20, boxShadow: '0 2px 12px rgba(32,44,88,0.08)', color: '#1F2B56', fontFamily: 'serif', fontSize: 16 }}>
@@ -15,14 +16,15 @@ const ShippingForm = (
 const AddPostsPage = () => {
     return (
         <>
-            <UserHeader />
+        <CreatePost />
+            {/* <UserHeader />
             <MultiColumnTemplate
                 imageSrc={shipperImg}
                 heading="Add Posts"
                 subheading="Posts Add Here"
                 rightComponent={<ShippingQuoteForm />}
                 extraInfo={ShippingForm}
-            />
+            /> */}
         </>
     );
 };

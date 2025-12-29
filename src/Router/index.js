@@ -12,6 +12,9 @@ import AddPostsPage from '../Pages/AddPosts';
 import AllListings from '../Components/Posts/AllListings';
 import RegistrationPage from '../Pages/Registration';
 import FilterSidebar from '../Components/Posts/FilterSidebar';
+import Dashboard from '../Components/Dashboard/userDashboard';
+import {AllPosts} from '../Components/Posts/AllPosts';
+import ProfileSettings from '../Components/Dashboard/ProfileSettings';
 
 export function AppRouter() {
     return (
@@ -21,11 +24,12 @@ export function AppRouter() {
                     <Route path='/' element={<Home />}> </Route>
                     <Route path="/login" element={<LoginPage/>}></Route>
                     <Route path="/register" element={<RegistrationPage/>}></Route>
-                    <Route path="/addposts" element={<AddPostsPage/>}></Route>
+                    <Route path="/create-post" element={<AddPostsPage/>}></Route>
                     <Route path="/userdashboard" element={<UserDashboard/>}></Route>
-                    {/* <Route path="/userdashboard1" element={<UserView/>}></Route> */}
-                    <Route path="/allListings" element={<AllListings/>}></Route>
+                    <Route path="/dashboard" element={<Dashboard/>}></Route>
+                    <Route path="/allListings" element={<AllPosts/>}></Route>
                     <Route path="/filterSidebar" element={<FilterSidebar/>}></Route>
+                    <Route path="/profile-settings" element={<ProfileSettings/>} />
                 </Routes>
             </Router>
         </>

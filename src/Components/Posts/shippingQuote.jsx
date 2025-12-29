@@ -8,18 +8,28 @@ import {
   Paper,
   Checkbox,
   FormControlLabel,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { add_post } from "../../Store/postReducer";
 import UserHeader from "../Dashboard/userHeader";
 
 const ShippingQuoteForm = () => {
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.authentication);
+  console.log(token, "token in ShippingQuoteForm");
+  const [submitting, setSubmitting] = useState(false);
+  const [apiMessage, setApiMessage] = useState("");
+  const [apiError, setApiError] = useState("");
   const [formData, setFormData] = useState({
     trailerType: "",
     quotedPriceUsd: "",
+    agreedToTerms: false,
     pickupLocation: {
       type: "",
       name: "",
-      addressLine1: "",
-      addressLine2: "",
+      addressLine: "",
       city: "",
       stateOrProvince: "",
       postalCode: "",
@@ -30,13 +40,11 @@ const ShippingQuoteForm = () => {
       contactCell: "",
       buyerReferenceNumber: "",
       twicRequired: false,
-      saveToAddressBook: false,
     },
     deliveryLocation: {
       type: "",
       name: "",
-      addressLine1: "",
-      addressLine2: "",
+      addressLine: "",
       city: "",
       stateOrProvince: "",
       postalCode: "",
@@ -47,7 +55,11 @@ const ShippingQuoteForm = () => {
       contactCell: "",
       buyerReferenceNumber: "",
       twicRequired: false,
-      saveToAddressBook: false,
+    },
+    vehicle: {
+      availableDate: "",
+      desiredDeliveryDate: "",
+      expirationDate: "",
     },
     vehicles: [
       {
@@ -64,6 +76,9 @@ const ShippingQuoteForm = () => {
         notes: "",
         inoperable: false,
         oversized: false,
+        availableDate: "",
+        desiredDeliveryDate: "",
+        expirationDate: "",
       },
     ],
   });
@@ -79,14 +94,111 @@ const ShippingQuoteForm = () => {
       updatedVehicles[index][field] =
         e.target.type === "checkbox" ? e.target.checked : e.target.value;
       setFormData({ ...formData, vehicles: updatedVehicles });
+    } else if (section === "vehicle") {
+      // top-level vehicle dates (availableDate, desiredDeliveryDate, expirationDate)
+      setFormData({
+        ...formData,
+        vehicle: { ...formData.vehicle, [field]: e.target.value },
+      });
     } else {
       setFormData({ ...formData, [field]: e.target.value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Shipping Quote Submitted:", formData);
+    setApiError("");
+    setApiMessage("");
+
+    // Validate required fields
+    if (!formData.agreedToTerms) {
+      setApiError("Please agree to the terms and conditions");
+      return;
+    }
+
+    if (!formData.trailerType || !formData.quotedPriceUsd) {
+      setApiError("Please fill in all required fields");
+      return;
+    }
+
+    // Get token from Redux or localStorage
+    const authToken = token || localStorage.getItem("token");
+    
+    if (!authToken) {
+      setApiError("Authentication token not found. Please login first.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const result = await dispatch(add_post(formData)).unwrap();
+      setApiMessage(result.message || "Shipping quote submitted successfully!");
+
+      // Reset form
+      setFormData({
+        trailerType: "",
+        quotedPriceUsd: "",
+        agreedToTerms: false,
+        pickupLocation: {
+          type: "",
+          name: "",
+          addressLine: "",
+          city: "",
+          stateOrProvince: "",
+          postalCode: "",
+          country: "",
+          contactName: "",
+          contactEmail: "",
+          contactPhone: "",
+          contactCell: "",
+          buyerReferenceNumber: "",
+          twicRequired: false,
+        },
+        deliveryLocation: {
+          type: "",
+          name: "",
+          addressLine: "",
+          city: "",
+          stateOrProvince: "",
+          postalCode: "",
+          country: "",
+          contactName: "",
+          contactEmail: "",
+          contactPhone: "",
+          contactCell: "",
+          buyerReferenceNumber: "",
+          twicRequired: false,
+        },
+        vehicles: [
+          {
+            vinAvailable: false,
+            vin: "",
+            type: "",
+            year: "",
+            make: "",
+            model: "",
+            color: "",
+            lotNumber: "",
+            licensePlate: "",
+            licenseStateOrProvince: "",
+            notes: "",
+            inoperable: false,
+            oversized: false,
+            availableDate: "",
+            desiredDeliveryDate: "",
+            expirationDate: "",
+          },
+        ],
+      });
+    } catch (error) {
+      // error is the rejection payload from thunk (string or object)
+      const errorMsg = typeof error === "string" ? error : error?.message || "Failed to submit quote";
+      setApiError(errorMsg);
+      console.error("Submission error:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -94,6 +206,20 @@ const ShippingQuoteForm = () => {
         <Typography variant="h5" align="center" gutterBottom>
           Shipping Quote Form
         </Typography>
+
+        {/* Error Alert */}
+        {apiError && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setApiError("")}>
+            {apiError}
+          </Alert>
+        )}
+
+        {/* Success Alert */}
+        {apiMessage && (
+          <Alert severity="success" sx={{ mb: 2 }} onClose={() => setApiMessage("")}>
+            {apiMessage}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* General Quote */}
@@ -143,15 +269,9 @@ const ShippingQuoteForm = () => {
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               fullWidth
-              label="Address Line 1"
-              value={formData.pickupLocation.addressLine1}
-              onChange={(e) => handleChange(e, "pickupLocation", "addressLine1")}
-            />
-            <TextField
-              fullWidth
-              label="Address Line 2"
-              value={formData.pickupLocation.addressLine2}
-              onChange={(e) => handleChange(e, "pickupLocation", "addressLine2")}
+              label="Address Line"
+              value={formData.pickupLocation.addressLine}
+              onChange={(e) => handleChange(e, "pickupLocation", "addressLine")}
             />
           </Box>
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -234,33 +354,149 @@ const ShippingQuoteForm = () => {
               }
               label="TWIC Required"
             />
+          </Box>
+
+          {/* Delivery Location */}
+          <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+            Delivery Location
+          </Typography>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Type"
+              value={formData.deliveryLocation.type}
+              onChange={(e) => handleChange(e, "deliveryLocation", "type")}
+            />
+            <TextField
+              fullWidth
+              label="Name"
+              value={formData.deliveryLocation.name}
+              onChange={(e) => handleChange(e, "deliveryLocation", "name")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Address Line"
+              value={formData.deliveryLocation.addressLine}
+              onChange={(e) => handleChange(e, "deliveryLocation", "addressLine")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="City"
+              value={formData.deliveryLocation.city}
+              onChange={(e) => handleChange(e, "deliveryLocation", "city")}
+            />
+            <TextField
+              fullWidth
+              label="State/Province"
+              value={formData.deliveryLocation.stateOrProvince}
+              onChange={(e) => handleChange(e, "deliveryLocation", "stateOrProvince")}
+            />
+            <TextField
+              fullWidth
+              label="Postal Code"
+              value={formData.deliveryLocation.postalCode}
+              onChange={(e) => handleChange(e, "deliveryLocation", "postalCode")}
+            />
+            <TextField
+              fullWidth
+              label="Country"
+              value={formData.deliveryLocation.country}
+              onChange={(e) => handleChange(e, "deliveryLocation", "country")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Contact Name"
+              value={formData.deliveryLocation.contactName}
+              onChange={(e) => handleChange(e, "deliveryLocation", "contactName")}
+            />
+            <TextField
+              fullWidth
+              label="Contact Email"
+              value={formData.deliveryLocation.contactEmail}
+              onChange={(e) => handleChange(e, "deliveryLocation", "contactEmail")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Contact Phone"
+              value={formData.deliveryLocation.contactPhone}
+              onChange={(e) => handleChange(e, "deliveryLocation", "contactPhone")}
+            />
+            <TextField
+              fullWidth
+              label="Contact Cell"
+              value={formData.deliveryLocation.contactCell}
+              onChange={(e) => handleChange(e, "deliveryLocation", "contactCell")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Buyer Reference #"
+              value={formData.deliveryLocation.buyerReferenceNumber}
+              onChange={(e) => handleChange(e, "deliveryLocation", "buyerReferenceNumber")}
+            />
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={formData.pickupLocation.saveToAddressBook}
+                  checked={formData.deliveryLocation.twicRequired}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pickupLocation: {
-                        ...formData.pickupLocation,
-                        saveToAddressBook: e.target.checked,
+                      deliveryLocation: {
+                        ...formData.deliveryLocation,
+                        twicRequired: e.target.checked,
                       },
                     })
                   }
                 />
               }
-              label="Save to Address Book"
+              label="TWIC Required"
             />
           </Box>
 
-          {/* Delivery Location */}
-          <Typography variant="h6" gutterBottom>
-            Delivery Location
+          {/* Vehicle Dates */}
+          <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+            Vehicle Dates
           </Typography>
-          {/* (Repeat same structure as Pickup, just replace section with "deliveryLocation") */}
+          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Available Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.vehicle.availableDate}
+              onChange={(e) => handleChange(e, "vehicle", "availableDate")}
+            />
+            <TextField
+              fullWidth
+              label="Desired Delivery Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.vehicle.desiredDeliveryDate}
+              onChange={(e) => handleChange(e, "vehicle", "desiredDeliveryDate")}
+            />
+            <TextField
+              fullWidth
+              label="Expiration Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.vehicle.expirationDate}
+              onChange={(e) => handleChange(e, "vehicle", "expirationDate")}
+            />
+          </Box>
 
           {/* Vehicles */}
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
             Vehicles
           </Typography>
           {formData.vehicles.map((vehicle, index) => (
@@ -348,9 +584,40 @@ const ShippingQuoteForm = () => {
             </Box>
           ))}
 
+          {/* Terms Agreement */}
+          <Box sx={{ mb: 3 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.agreedToTerms}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      agreedToTerms: e.target.checked,
+                    })
+                  }
+                />
+              }
+              label="I agree to the terms and conditions"
+            />
+          </Box>
+
           {/* Submit */}
-          <Button type="submit" variant="contained" fullWidth sx={{ py: 1.2, fontWeight: "bold" }}>
-            Submit Quote
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={submitting}
+            sx={{ py: 1.2, fontWeight: "bold", position: "relative" }}
+          >
+            {submitting ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Submitting...
+              </>
+            ) : (
+              "Submit Quote"
+            )}
           </Button>
         </form>
     </Paper>

@@ -1,90 +1,72 @@
-import React from "react";
-import { Box, Grid, Typography, Link, IconButton } from "@mui/material";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import Logo from './Assets/Logo.png';
+import React from 'react';
+import { Box, Container, Typography, Grid, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const Footer = () => {
+export default function Footer() {
+  const navigate = useNavigate();
+
   return (
-    <Box
-      component="footer"
-      sx={{
-        backgroundColor: "#202c58",
-        color: "white",
-        py: 6,
-        px: 4,
-        mt: 6
-      }}
-    >
-      <Grid container spacing={4} justifyContent="center">
-        {/* Left Column - Branding */}
-        <Grid item xs={12} md={4}>
-            <img src={Logo} width="200px" height='150px'/>
-          
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            Moving vehicles is better when you have the power to…
-          </Typography>
+    <Box sx={{ bgcolor: '#1F2B56', color: 'white', py: 6 }}>
+      <Container maxWidth="lg">
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={4}>
+            <Typography variant="h6" gutterBottom>
+              Transport Platform
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              Connecting shippers, carriers, and transporters in one easy place.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="h6" gutterBottom>
+              Quick Links
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Link
+                component="button"
+                onClick={() => navigate('/')}
+                sx={{ color: 'white', opacity: 0.8, textAlign: 'left', textDecoration: 'none' }}
+              >
+                Home
+              </Link>
+              <Link
+                component="button"
+                onClick={() => navigate('/contact-support')}
+                sx={{ color: 'white', opacity: 0.8, textAlign: 'left', textDecoration: 'none' }}
+              >
+                Contact & Support
+              </Link>
+              <Link
+                component="button"
+                onClick={() => navigate('/disclaimer')}
+                sx={{ color: 'white', opacity: 0.8, textAlign: 'left', textDecoration: 'none' }}
+              >
+                Disclaimer
+              </Link>
+              <Link
+                component="button"
+                onClick={() => navigate('/registration-info')}
+                sx={{ color: 'white', opacity: 0.8, textAlign: 'left', textDecoration: 'none' }}
+              >
+                Registration Info
+              </Link>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="h6" gutterBottom>
+              Legal
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              This platform is a neutral marketplace. We are not responsible for any damages, disputes, or unauthorized transport activity.
+            </Typography>
+          </Grid>
         </Grid>
-
-        {/* Middle Column - Quick Links */}
-        <Grid item xs={12} md={4}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "#b79f04", mb: 1 }}
-          >
-            Quick Links
+        <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', mt: 4, pt: 4, textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ opacity: 0.6 }}>
+            © {new Date().getFullYear()} Transport Platform. All rights reserved.
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Link href="/" underline="hover" color="inherit">
-              Home
-            </Link>
-            <Link href="/about" underline="hover" color="inherit">
-              About
-            </Link>
-            <Link href="/services" underline="hover" color="inherit">
-              Services
-            </Link>
-            <Link href="/contact" underline="hover" color="inherit">
-              Contact
-            </Link>
-          </Box>
-        </Grid>
-
-        {/* Right Column - Social */}
-        <Grid item xs={12} md={4}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "#b79f04", mb: 1 }}
-          >
-            Follow Us
-          </Typography>
-          <Box>
-            <IconButton href="#" sx={{ color: "white" }}>
-              <FacebookIcon />
-            </IconButton>
-            <IconButton href="#" sx={{ color: "white" }}>
-              <TwitterIcon />
-            </IconButton>
-            <IconButton href="#" sx={{ color: "white" }}>
-              <LinkedInIcon />
-            </IconButton>
-            <IconButton href="#" sx={{ color: "white" }}>
-              <InstagramIcon />
-            </IconButton>
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* Bottom Bar */}
-      <Box sx={{ textAlign: "center", mt: 4, borderTop: "1px solid #444", pt: 2 }}>
-        <Typography variant="body2">
-          © {new Date().getFullYear()} Central Dispatch. All rights reserved.
-        </Typography>
-      </Box>
+        </Box>
+      </Container>
     </Box>
   );
-};
-
-export default Footer;
+}

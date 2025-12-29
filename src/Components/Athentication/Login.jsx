@@ -52,7 +52,7 @@ export const LoginForm = () => {
                             } catch (err) {
                                 // ignore storage errors
                             }
-                            navigate('/userdashboard');
+                            navigate('/dashboard');
                         } else {
                             setError(payload.message || 'Unable to login. Please check credentials.');
                         }

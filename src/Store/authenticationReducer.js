@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { REGISTRATION, LOGIN } from '../Constants/URL'
+import { REGISTRATION, LOGIN,GET_PROFILE } from '../Constants/URL'
 
 let initialState = {
     "name": "",
@@ -35,6 +35,31 @@ export const register_user = createAsyncThunk(
         return res.json();
     }
 )
+// Get My Info 
+export const get_mydetails = createAsyncThunk(
+    "posts/get_posts",
+    async (params = {}, thunkApi) => {
+        try {
+            // Build query string dynamically
+            const queryString = new URLSearchParams(
+                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
+            ).toString();
+
+            const url = `${GET_PROFILE}?${queryString}`;
+            console.log("Fetching:", url);
+
+            const res = await fetch(url, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);
+            return await res.json();
+        } catch (error) {
+            return thunkApi.rejectWithValue(error.message);
+        }
+    }
+);
 
 // Login User
 

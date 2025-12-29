@@ -28,19 +28,42 @@ let initialState = {
 export const add_post = createAsyncThunk(
     "add_post",
     async (data, thunkApi) => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        };
-        const res = await fetch(POSTS, requestOptions)
-        return res.json();
+        try {
+            // attempt to read token from redux state, fallback to localStorage
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify(data),
+            };
+
+            const res = await fetch(POSTS, requestOptions);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ message: res.statusText }));
+                return thunkApi.rejectWithValue(err.message || `Failed to create post: ${res.status}`);
+            }
+            return await res.json();
+        } catch (error) {
+            return thunkApi.rejectWithValue(error.message || 'Network error');
+        }
     }
 )
 export const get_posts = createAsyncThunk(
     "posts/get_posts",
     async (params = {}, thunkApi) => {
         try {
+            // attempt to read token from redux state, fallback to localStorage
+            
+
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log("Token:", token);
+
             // Build query string dynamically
             const queryString = new URLSearchParams(
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
@@ -49,10 +72,16 @@ export const get_posts = createAsyncThunk(
             const url = `${POSTS}?${queryString}`;
             console.log("Fetching:", url);
 
-            const res = await fetch(url, {
+            const requestOptions = {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+            };
+
+            const res = await fetch(url, requestOptions);
+            console.log("Fetch completed, status:", res.status);
 
             if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);
             return await res.json();
@@ -61,6 +90,8 @@ export const get_posts = createAsyncThunk(
         }
     }
 );
+
+
 
 export const get_post_by_id = createAsyncThunk(
     "posts/get_post_by_id",
@@ -148,17 +179,22 @@ export const postsSlice = createSlice({
             .addCase(get_posts.pending, (state) => {
                 state.loading = true;
                 state.status = "pending";
+                console.log(state.posts, "posts in slice pending");
+
             })
             .addCase(get_posts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.status = "fulfilled";
                 state.posts = action.payload?.data || action.payload;
                 state.message = "Posts fetched successfully";
+                console.log(state.posts, "posts in slice fullfillled");
             })
             .addCase(get_posts.rejected, (state, action) => {
                 state.loading = false;
                 state.status = "rejected";
                 state.message = action.payload || "Failed to fetch posts";
+                console.log(state.posts, "posts in slice rejected");
+
             });
 
         // 🟢 Get Post by ID
