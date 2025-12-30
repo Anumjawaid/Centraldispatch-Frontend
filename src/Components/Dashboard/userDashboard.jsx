@@ -7,11 +7,7 @@ import {
     Grid,
     Card,
     CardContent,
-    CardActions,
-    Chip,
-    IconButton,
-    Menu,
-    MenuItem,
+   
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
@@ -20,20 +16,19 @@ import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { get_posts } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
-import AllPosts from '../Posts/AllPosts';
+import Header from '../Header';
 
 
-export default function Dashboard({ currentUser, onLogout }) {
-    console.log("userDashboard component rendered");
+export default function Dashboard() {
     const auth = useSelector((state) => state.authentication || {});
     const dispatch = useDispatch();
     console.log(auth, "auth in dashboard");
-    const posts = useSelector((state) => state.posts || {});
-    console.log(posts, "postsState in dashboard");
+    
 
     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
     const token = auth.token || localStorage.getItem('token');
     console.log(token, "token in dashboard");
+    console.log(user, "user in dashboard");
     const isLoggedIn = Boolean(user || token);
     console.log(isLoggedIn, "isLoggedIn in dashboard");
 
@@ -58,59 +53,10 @@ export default function Dashboard({ currentUser, onLogout }) {
     }, [isLoggedIn, user, dispatch]);
 
 
-
-
-    const handleMenuOpen = (event, postId) => {
-        setAnchorEl(event.currentTarget);
-        setSelectedPost(postId);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        setSelectedPost(null);
-    };
-
-
-    const handleChatDriver = (post) => {
-        setSelectedDriver({
-            name: post.driver || 'Available Driver',
-            company: post.driverCompany || 'Transport Company',
-        });
-        setSelectedShipment(post);
-        setChatOpen(true);
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'listing':
-                return 'info';
-            case 'assigned':
-                return 'warning';
-            case 'pickedup':
-                return 'primary';
-            case 'delivered':
-                return 'success';
-            default:
-                return 'default';
-        }
-    };
-
-    const getStatusLabel = (status) => {
-        switch (status) {
-            case 'listing':
-                return 'Open Listing';
-            case 'assigned':
-                return 'Assigned';
-            case 'pickedup':
-                return 'In Transit';
-            case 'delivered':
-                return 'Delivered';
-            default:
-                return status;
-        }
-    };
-
+   
     return (
+        <>
+        <Header/>
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
 
             <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -118,10 +64,10 @@ export default function Dashboard({ currentUser, onLogout }) {
                 <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                     <Box>
                         <Typography variant="h4" gutterBottom>
-                            Welcome back, {currentUser?.name || 'User'}!
+                            Welcome back, {user?.name || 'User'}!
                         </Typography>
                         <Typography variant="body1" color="text.secondary">
-                            {currentUser?.companyName || 'Your Company'}
+                            {user?.companyName || 'Your Company'}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 2 }}>
@@ -192,23 +138,11 @@ export default function Dashboard({ currentUser, onLogout }) {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Card sx={{ bgcolor: '#f5f5f5' }}>
-                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                                <Typography variant="h3" color="primary">
-                                    {posts.length}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Active Posts
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <AllPosts />
                 </Grid>
             </Container>
 
 
         </Box>
+        </>
     );
 }

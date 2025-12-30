@@ -49,13 +49,13 @@ export default function LoginForm({ onLogin }) {
 
                 if (accessToken || successMessage) {
                     try {
-                        if (payload.data) localStorage.setItem('user', JSON.stringify(payload.data));
                         if (accessToken) localStorage.setItem('token', accessToken);
-                        else if (payload.token) localStorage.setItem('token', payload.token);
+                        navigate('/dashboard');
                     } catch (err) {
                         // ignore storage errors
+                         setError(payload.message || 'Unable to login. Please check credentials.');
                     }
-                    navigate('/dashboard');
+                    
                 } else {
                     setError(payload.message || 'Unable to login. Please check credentials.');
                 }

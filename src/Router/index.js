@@ -9,12 +9,12 @@ import ShippingQuoteForm from '../Components/Posts/shippingQuote';
 import UserDashboard from '../Components/Dashboard/userpage'
 import UserView from '../Components/Dashboard/userDashboard';
 import AddPostsPage from '../Pages/AddPosts';
-import AllListings from '../Components/Posts/AllListings';
 import RegistrationPage from '../Pages/Registration';
 import FilterSidebar from '../Components/Posts/FilterSidebar';
 import Dashboard from '../Components/Dashboard/userDashboard';
-import AllPosts from '../Components/Posts/AllPosts';
 import ProfileSettings from '../Components/Dashboard/ProfileSettings';
+import AllListings from '../Components/Posts/AllListings';
+import PostDetailsPage from '../Pages/PostDetails';
 
 export function AppRouter() {
     return (
@@ -27,9 +27,10 @@ export function AppRouter() {
                     <Route path="/create-post" element={<AddPostsPage/>}></Route>
                     <Route path="/userdashboard" element={<UserDashboard/>}></Route>
                     <Route path="/dashboard" element={<Dashboard/>}></Route>
-                    <Route path="/allListings" element={<AllPosts/>}></Route>
+                    <Route path="/allListings" element={<AllListings/>}></Route>
                     <Route path="/filterSidebar" element={<FilterSidebar/>}></Route>
                     <Route path="/profile-settings" element={<ProfileSettings/>} />
+                    <Route path="/post" element={<PostDetailsPage/>} />
                 </Routes>
             </Router>
         </>

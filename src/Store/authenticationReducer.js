@@ -127,7 +127,7 @@ export const authSlice = createSlice({
                 state.status = 'rejected';
             } else {
                 state.token = accessToken || null;
-                console.log(accessToken,"accessToken in reducer");
+                state.user = {...payload.user}
                 state.message = payload.message || "Successfully logged in";
                 state.status = 'fulfilled';
             }

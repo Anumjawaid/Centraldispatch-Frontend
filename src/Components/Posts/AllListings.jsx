@@ -1,100 +1,186 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
-import UserHeader from "../Dashboard/userHeader";
-import QuoteListRow from "./ListRow";
+import React, { useState } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Grid,
+  Chip,
+  Button,
+} from '@mui/material';
+import Header from '../Header';
+import ChatScreen from '../Chat/ChatScreen';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ChatIcon from '@mui/icons-material/Chat';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useSelector } from 'react-redux';
+import AllPosts from './AllPosts';
 
-export default function AllListings() {
-  const handleEdit = (item) => console.log("Edit:", item);
-  const handleDelete = (item) => console.log("Delete:", item);
-  const handleView = (item) => console.log("View:", item);
+
+
+export default function AllListings({ currentUser }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const postsState = useSelector((state) => state.posts || {});
+  console.log(postsState, "posts in all posts");
+  const posts = postsState.posts.rows || [];
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get('tab') || 'listing';
+
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [selectedShipment, setSelectedShipment] = useState(null);
+
+  const mockListings = {
+    listing: [...posts],
+    assigned: [
+    ],
+    pickedup: [
+    ],
+    delivered: [
+    ],
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const handleChatDriver = (listing) => {
+    setSelectedDriver({
+      name: listing.driver || 'Available Driver',
+      company: listing.driverCompany || 'Transport Company',
+    });
+    setSelectedShipment(listing);
+    setChatOpen(true);
+  };
+
+  const renderListings = (listings, status) => {
+    if (listings.length === 0) {
+      return (
+        <Card sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="body1" color="text.secondary">
+            No {status} shipments found
+          </Typography>
+        </Card>
+      );
+    }
+
+    return (
+      <Grid container spacing={3}>
+        <AllPosts/>
+        {/* {listings.map((listing) => (
+          <Grid item xs={12} md={6} key={listing.id}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                  <Typography variant="h6">{listing.title}</Typography>
+                  <Chip
+                    label={status.charAt(0).toUpperCase() + status.slice(1)}
+                    color={
+                      status === 'listing' ? 'info' :
+                        status === 'assigned' ? 'warning' :
+                          status === 'pickedup' ? 'primary' :
+                            'success'
+                    }
+                    size="small"
+                  />
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <strong>From:</strong> {listing.from}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <strong>To:</strong> {listing.to}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <strong>Price:</strong> ${listing.price}
+                </Typography>
+                {listing.driver && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>Driver:</strong> {listing.driver}
+                  </Typography>
+                )}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <strong>Date:</strong> {listing.date}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Button size="small" variant="outlined">
+                    View Details
+                  </Button>
+                  {status === 'listing' && (
+                    <Button size="small" variant="contained">
+                      Assign Driver
+                    </Button>
+                  )}
+                  {(status === 'assigned' || status === 'pickedup') && listing.driver && (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      startIcon={<ChatIcon />}
+                      onClick={() => handleChatDriver(listing)}
+                    >
+                      Chat Driver
+                    </Button>
+                  )}
+                  {status === 'delivered' && (
+                    <Button size="small" variant="outlined" color="success">
+                      Leave Review
+                    </Button>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))} */}
+      </Grid>
+    );
+  };
 
   return (
-    <React.Fragment>
-      <UserHeader />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Header isAuthenticated={true} />
 
-      {/* ✅ Center container */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center", // vertical center
-          alignItems: "center", // horizontal center
-          backgroundColor: "#f9fafc",
-          
-        }}
-      >
-        <Typography variant="h5" fontWeight={600} mb={3}>
-          All Listings
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/dashboard')}
+          sx={{ mb: 3 }}
+        >
+          Back to Dashboard
+        </Button>
+        <Typography variant="h4" gutterBottom>
+          Listing & Status
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+          Manage and track your shipment listings
         </Typography>
 
-        {/* ✅ Map through multiple rows */}
-        <Box sx={{ width: "80%", maxWidth: "1000px" }}>
-          {sampleData.map((item, index) => (
-            <QuoteListRow
-              key={index}
-              data={item}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onView={handleView}
-            />
-          ))}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+          <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
+            <Tab label="Listing" value="listing" />
+            <Tab label="Assigned" value="assigned" />
+            <Tab label="Picked Up" value="pickedup" />
+            <Tab label="Delivered" value="delivered" />
+          </Tabs>
         </Box>
-      </Box>
-    </React.Fragment>
+
+        {activeTab === 'listing' && renderListings(mockListings.listing, 'listing')}
+        {activeTab === 'assigned' && renderListings(mockListings.assigned, 'assigned')}
+        {activeTab === 'pickedup' && renderListings(mockListings.pickedup, 'picked up')}
+        {activeTab === 'delivered' && renderListings(mockListings.delivered, 'delivered')}
+      </Container>
+
+      {chatOpen && (
+        <ChatScreen
+          open={chatOpen}
+          driver={selectedDriver}
+          shipment={selectedShipment}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
+    </Box>
   );
 }
-
-
-let sampleData=[
-  {
-    "id": "Q-001",
-    "trailerType": "OPEN",
-    "availableDate": "2025-10-10",
-    "pickupLocation": {
-      "city": "Dallas",
-      "stateOrProvince": "TX",
-      "country": "US",
-      "name": "AutoHub Dallas (Dock 3)"
-    },
-    "deliveryLocation": {
-      "city": "Miami",
-      "stateOrProvince": "FL",
-      "country": "US",
-      "name": "Port of Miami - Gate B"
-    }
-  },
-  {
-    "id": "Q-002",
-    "trailerType": "ENCLOSED",
-    "availableDate": "2025-10-12",
-    "pickupLocation": {
-      "city": "Atlanta",
-      "stateOrProvince": "GA",
-      "country": "US",
-      "name": "Peach Logistics Hub"
-    },
-    "deliveryLocation": {
-      "city": "New York",
-      "stateOrProvince": "NY",
-      "country": "US",
-      "name": "Harbor Freight Terminal"
-    }
-  },
-  {
-    "id": "Q-003",
-    "trailerType": "FLATBED",
-    "availableDate": "2025-10-15",
-    "pickupLocation": {
-      "city": "Houston",
-      "stateOrProvince": "TX",
-      "country": "US",
-      "name": "Bay Area Freight Yard"
-    },
-    "deliveryLocation": {
-      "city": "Chicago",
-      "stateOrProvince": "IL",
-      "country": "US",
-      "name": "Midwest Distribution Center"
-    }
-  }
-]

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Container,
@@ -21,6 +21,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ChatScreen from '../Chat/ChatScreen';
 import { get_posts } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
+import Header from '../Header';
 
 
 
@@ -38,8 +39,7 @@ export default function AllPosts() {
     const token = auth.token || localStorage.getItem('token');
     // console.log(token, "token in dashboard");
     const isLoggedIn = Boolean(user || token);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedPost, setSelectedPost] = useState(null);
+
     useEffect(() => {
         // Fetch user profile if logged in and user data is not present
         if (isLoggedIn && !user) {
@@ -49,45 +49,10 @@ export default function AllPosts() {
     }, [isLoggedIn, user, dispatch]);
 
 
-    // // Mock active posts
-    // const [posts] = useState([
-    //     {
-    //         id: 1,
-    //         title: 'Vehicle Transport: Toyota Camry',
-    //         pickupLocation: 'Los Angeles, CA',
-    //         deliveryLocation: 'New York, NY',
-    //         status: 'listing',
-    //         quotedPrice: 1200,
-    //         vehicleType: 'Sedan',
-    //         createdAt: '2024-01-15',
-    //     },
-    //     {
-    //         id: 2,
-    //         title: 'Vehicle Transport: Ford F-150',
-    //         pickupLocation: 'Houston, TX',
-    //         deliveryLocation: 'Miami, FL',
-    //         status: 'assigned',
-    //         quotedPrice: 900,
-    //         vehicleType: 'Pickup Truck',
-    //         createdAt: '2024-01-18',
-    //     },
-    //     {
-    //         id: 3,
-    //         title: 'Vehicle Transport: Honda Civic',
-    //         pickupLocation: 'Seattle, WA',
-    //         deliveryLocation: 'Denver, CO',
-    //         status: 'pickedup',
-    //         quotedPrice: 750,
-    //         vehicleType: 'Sedan',
-    //         createdAt: '2024-01-20',
-    //     },
-    // ]);
 
-    const handleEdit = (item) => console.log("Edit:", item);
-    const handleDelete = (item) => console.log("Delete:", item);
-    const handleView = (item) => console.log("View:", item);
     return (
         <>
+         <Header />
             {/* Recent Posts */}
             <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
                 Your Active Posts
@@ -125,16 +90,21 @@ function MainCard({ post }) {
     const [chatOpen, setChatOpen] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [selectedShipment, setSelectedShipment] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedPost, setSelectedPost] = useState(null);
     console.log(post, "post");
     const handleMenuOpen = (event, postId) => {
-        // setAnchorEl(event.currentTarget);
-        // setSelectedPost(postId);
+        setAnchorEl(event.currentTarget);
+        setSelectedPost(postId);
     };
 
     const handleMenuClose = () => {
-        // setAnchorEl(null);
-        // setSelectedPost(null);
+        setAnchorEl(null);
+        setSelectedPost(null);
     };
+    const handleEdit = (item) => console.log("Edit:", item);
+    const handleDelete = (item) => console.log("Delete:", item);
+    const handleView = (item) => console.log("View:", item);
     const getStatusColor = (status) => {
         switch (status) {
             case 'listing':
@@ -186,6 +156,7 @@ function MainCard({ post }) {
     };
     return (
         <>
+           
             <Grid item xs={12} md={6} lg={4} key={post.id}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flexGrow: 1 }}>
@@ -219,17 +190,17 @@ function MainCard({ post }) {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button size="small" color="primary">
+                        <Button size="small" color="primary" onClick={() => navigate("/post")}>
                             View Details
                         </Button>
-                        
-                            <Button
-                                size="small"
-                                startIcon={<ChatIcon />}
-                                onClick={() => handleChatDriver(post)}
-                            >
-                                Chat Driver
-                            </Button>
+
+                        <Button
+                            size="small"
+                            startIcon={<ChatIcon />}
+                            onClick={() => handleChatDriver(post)}
+                        >
+                            Chat Driver
+                        </Button>
                     </CardActions>
                 </Card>
             </Grid>
