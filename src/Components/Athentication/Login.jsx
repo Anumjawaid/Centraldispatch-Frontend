@@ -67,21 +67,22 @@ export default function LoginForm({ onLogin }) {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
-            <Grid container sx={{ flex: 1 }}>
-                {/* Left side - GIF/Animation */}
-                <Grid
-                    item
-                    xs={12}
-                    md={6}
-                    sx={{
-                        bgcolor: 'primary.main',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        p: 4,
-                    }}
-                >
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Container maxWidth="lg">
+                <Grid container>
+                    {/* Left side - GIF/Animation */}
+                    <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        sx={{
+                            bgcolor: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            p: 4,
+                        }}
+                    >
                     <Box sx={{ textAlign: 'center', color: 'white' }}>
                         <Typography variant="h3" gutterBottom>
                             Welcome Back!
@@ -92,7 +93,7 @@ export default function LoginForm({ onLogin }) {
                         <Box
                             sx={{
                                 width: '100%',
-                                maxWidth: 400,
+                                maxWidth: 600,
                                 height: 400,
                                 bgcolor: 'rgba(255,255,255,0.1)',
                                 borderRadius: 2,
@@ -111,9 +112,8 @@ export default function LoginForm({ onLogin }) {
                 </Grid>
 
                 {/* Right side - Login Form */}
-                <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Container maxWidth="sm" sx={{ py: 6 }}>
-                        <Paper elevation={3} sx={{ p: 6 }}>
+                <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+                    <Paper elevation={3} sx={{ p: 6, maxWidth: 400, width: '100%' }}>
                             <Typography variant="h4" gutterBottom align="center" color="primary">
                                 Login
                             </Typography>
@@ -169,9 +169,9 @@ export default function LoginForm({ onLogin }) {
                                 </Grid>
                             </form>
                         </Paper>
-                    </Container>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Container>
         </Box>
     );
 }

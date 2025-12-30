@@ -203,16 +203,16 @@ function MainCard({ post }) {
                             {post.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            <strong>From:</strong> {post.pickupLocation}
+                            <strong>From:</strong> {post.pickupLocationId.addressLine}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            <strong>To:</strong> {post.deliveryLocation}
+                            <strong>To:</strong> {post.deliveryLocationId.addressLine}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            <strong>Vehicle:</strong> {post.vehicleType}
+                            <strong>Vehicle:</strong> {post.vehicles[0].type}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            <strong>Quoted Price:</strong> ${post.quotedPrice}
+                            <strong>Quoted Price:</strong> ${post.quotedPriceUsd}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                             <strong>Posted:</strong> {post.createdAt}
@@ -222,7 +222,7 @@ function MainCard({ post }) {
                         <Button size="small" color="primary">
                             View Details
                         </Button>
-                        {(post.status === 'assigned' || post.status === 'pickedup') && (
+                        
                             <Button
                                 size="small"
                                 startIcon={<ChatIcon />}
@@ -230,7 +230,6 @@ function MainCard({ post }) {
                             >
                                 Chat Driver
                             </Button>
-                        )}
                     </CardActions>
                 </Card>
             </Grid>
