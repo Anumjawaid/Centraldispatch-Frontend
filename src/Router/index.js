@@ -15,7 +15,7 @@ import ChatPage from '../Pages/ChatPage';
 import Dashboard from '../Components/Dashboard/userDashboard';
 import ProfileSettings from '../Components/Dashboard/ProfileSettings';
 import AllListings from '../Components/Posts/AllListings';
-import PostDetailsPage from '../Pages/PostDetails';
+import PostDetailsPage from '../Components/Posts/PostDetail';
 
 export function AppRouter() {
     return (
