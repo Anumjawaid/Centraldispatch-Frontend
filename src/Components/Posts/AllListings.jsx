@@ -96,8 +96,8 @@ export default function AllListings() {
   console.log("Conversations updated:", conversations);
   }, [conversations]);
   return (
-    <React.Fragment>
-      <UserHeader />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Header isAuthenticated={true} />
 
       <Box
         sx={{

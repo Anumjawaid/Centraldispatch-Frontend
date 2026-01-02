@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { REGISTRATION, LOGIN } from '../Constants/URL'
+import { REGISTRATION, LOGIN,GET_PROFILE } from '../Constants/URL'
 
 let initialState = {
     "name": "",
@@ -35,6 +35,37 @@ export const register_user = createAsyncThunk(
         return res.json();
     }
 )
+// Get My Info 
+export const get_mydetails = createAsyncThunk(
+    "get_my_info",
+    async (params = {}, thunkApi) => {
+        try {
+             const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log("Token:", token);
+            // Build query string dynamically
+            const queryString = new URLSearchParams(
+                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
+            ).toString();
+
+            const url = `${GET_PROFILE}?${queryString}`;
+            console.log("Fetching:", url);
+
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+            });
+
+            if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);
+            return await res.json();
+        } catch (error) {
+            return thunkApi.rejectWithValue(error.message);
+        }
+    }
+);
 
 // Login User
 
@@ -90,14 +121,13 @@ export const authSlice = createSlice({
             console.log("Fullfilled", action.payload)
             const payload = action.payload || {};
             // try to extract token and user
-            const accessToken = payload.accessToken || payload.token || payload.data?.token;
-            const user = payload.data || null;
+            const accessToken = payload.accessToken
             if (!accessToken && !payload.message) {
                 state.message = "Unable To Process Request Atm,Try Again Later";
                 state.status = 'rejected';
             } else {
                 state.token = accessToken || null;
-                state.user = user;
+                state.user = {...payload.user}
                 state.message = payload.message || "Successfully logged in";
                 state.status = 'fulfilled';
             }

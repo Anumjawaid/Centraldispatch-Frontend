@@ -3,13 +3,15 @@ import { configureStore } from "@reduxjs/toolkit";
 // import { themeSlice } from "./themeReducer";
 import { authSlice } from "./authenticationReducer";
 import chatReducer from "./chatReducer";
+import postsSlice from "./postReducer";
 // import { catSlice } from "./CategoriesReducer";
 
-export const Store = configureStore({
-  reducer: {
-    // theme:themeSlice.reducer,
-    authentication: authSlice.reducer,
-    chat: chatReducer,
-    // categories:catSlice.reducer,
-  },
-});
+
+export const Store=configureStore({   //setup and configure Store
+    reducer:{
+        // define whatever you want to define here 
+        authentication:authSlice.reducer,
+        posts: postsSlice,
+        chat: chatReducer,
+    }
+})
