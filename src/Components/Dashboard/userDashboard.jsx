@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import UserHeader from "./userHeader"
-import DashboardContainer from "./DashboardContainer"
-import { useEffect } from "react";
-export default function  UserView(){
-    
-    return(
-        <>
-        <UserHeader/>
-        <DashboardContainer/>
-=======
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -28,6 +17,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { get_posts } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { resetChat } from '../../Store/chatReducer';
 
 
 export default function Dashboard() {
@@ -47,7 +38,7 @@ export default function Dashboard() {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         // redirect to login
-        navigate('/login');
+        navigate('/login',{ replace: true });
     };
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -57,11 +48,11 @@ export default function Dashboard() {
     const [selectedShipment, setSelectedShipment] = useState(null);
     useEffect(() => {
         // Fetch user profile if logged in and user data is not present
-        if (isLoggedIn && !user) {
-        }
-        console.log("Dispatching get_posts");
-        dispatch(get_posts());
-    }, [isLoggedIn, user, dispatch]);
+        // if (isLoggedIn && !user) {
+        // }
+        // console.log("Dispatching get_posts");
+        dispatch(resetChat());
+    }, []);
 
 
    
@@ -149,12 +140,26 @@ export default function Dashboard() {
                             </CardContent>
                         </Card>
                     </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Card
+                            sx={{
+                                cursor: 'pointer',
+                                transition: 'transform 0.2s',
+                                '&:hover': { transform: 'translateY(-4px)' },
+                            }}
+                            onClick={() => navigate('/chat')}
+                        >
+                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                                <ChatBubbleOutlineIcon sx={{ fontSize: 48, mb: 2, color: 'primary.main' }} />
+                                <Typography variant="h6">My Chats</Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
                 </Grid>
             </Container>
 
 
         </Box>
->>>>>>> 5d7d1ce55805ed7c8197b7fc47cc52104cc9dba2
         </>
     );
 }

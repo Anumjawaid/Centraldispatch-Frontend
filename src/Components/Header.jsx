@@ -50,6 +50,7 @@ export default function Header({ isAuthenticated = false }) {
   const authenticatedItems = [
     { label: 'Profile Settings', path: '/profile-settings' },
     { label: 'Billing', path: '/billing' },
+    { label: 'Chat', path: '/chat' },
   ];
 
   const listingSubmenu = [
@@ -58,8 +59,19 @@ export default function Header({ isAuthenticated = false }) {
     { label: 'Assigned', path: '/listing-status?tab=assigned' },
     { label: 'Picked Up', path: '/listing-status?tab=pickedup' },
     { label: 'Delivered', path: '/listing-status?tab=delivered' },
+    { label: 'Chat', path: '/chat' },
   ];
 
+  const handleHomeNavigation = () => {  
+    //check if user is authenticated
+    const token = localStorage.getItem('token');
+    const isAuthenticated = Boolean(token);
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  }
   return (
     <AppBar position="static" color="primary" elevation={2}>
       <Toolbar>
@@ -68,7 +80,7 @@ export default function Header({ isAuthenticated = false }) {
           variant="h6"
           component="div"
           sx={{ flexGrow: isMobile ? 1 : 0, mr: 4, cursor: 'pointer' }}
-          onClick={() => navigate('/')}
+          onClick={handleHomeNavigation}
         >
           Transport Platform
         </Typography>
@@ -128,7 +140,7 @@ export default function Header({ isAuthenticated = false }) {
           </>
         ) : (
           <Box sx={{ flexGrow: 1, display: 'flex', gap: 1 }}>
-            <Button color="inherit" onClick={() => navigate('/')}>
+            <Button color="inherit" onClick={handleHomeNavigation}>
               Home
             </Button>
             <Button

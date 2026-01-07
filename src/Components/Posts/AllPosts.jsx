@@ -22,6 +22,8 @@ import ChatScreen from '../Chat/ChatScreen';
 import { get_posts } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
+import { resetChat, setListingsPaneOpen } from '../../Store/chatReducer';
+import { startChat } from '../../utils/socketClient';
 
 
 
@@ -29,7 +31,7 @@ export default function AllPosts() {
     const navigate = useNavigate();
 
     const postsState = useSelector((state) => state.posts || {});
-    console.log(postsState, "posts in all posts");
+    // console.log(postsState, "posts in all posts");
     const posts = postsState.posts.rows || [];
     const auth = useSelector((state) => state.authentication || {});
     const dispatch = useDispatch();
@@ -40,19 +42,19 @@ export default function AllPosts() {
     // console.log(token, "token in dashboard");
     const isLoggedIn = Boolean(user || token);
 
-    useEffect(() => {
-        // Fetch user profile if logged in and user data is not present
-        if (isLoggedIn && !user) {
-        }
-        console.log("Dispatching get_posts");
-        dispatch(get_posts());
-    }, [isLoggedIn, user, dispatch]);
+    // useEffect(() => {
+    //     // Fetch user profile if logged in and user data is not present
+    //     if (isLoggedIn && !user) {
+    //     }
+    //     console.log("Dispatching get_posts");
+    //     dispatch(get_posts());
+    // }, [isLoggedIn, user, dispatch]);
 
 
 
     return (
         <>
-         <Header />
+            <Header />
             {/* Recent Posts */}
             <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
                 Your Active Posts
@@ -87,12 +89,15 @@ export default function AllPosts() {
 }
 
 function MainCard({ post }) {
+    const navigate = useNavigate();
     const [chatOpen, setChatOpen] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [selectedShipment, setSelectedShipment] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedPost, setSelectedPost] = useState(null);
-    console.log(post, "post");
+    const [toUserId, setToUserId] = useState("");
+    const dispatch = useDispatch();
+    // console.log(post, "post");
     const handleMenuOpen = (event, postId) => {
         setAnchorEl(event.currentTarget);
         setSelectedPost(postId);
@@ -134,29 +139,43 @@ function MainCard({ post }) {
                 return status;
         }
     };
-
+    const ME = JSON.parse(localStorage.getItem('user') || 'null');
     const handleChatDriver = (post) => {
+        // setSelectedDriver({
+        //     name: post.driver || 'Available Driver',
+        //     company: post.driverCompany || 'Transport Company',
+        // });
+
+        // setSelectedShipment({
+        //     title: post.title,
+        //     ...post,
+        // });
+        const to = post.createdBy == ME.id ? post.carrier : post.createdBy;
+        // setChatOpen(true);
+        console.log("Starting chat", post);
+        startChat(to || "", post?._id);
+        // setActivepost(item);
+        setToUserId(to);
+        dispatch(setListingsPaneOpen(true));
+
         setSelectedDriver({
             name: post.driver || 'Available Driver',
             company: post.driverCompany || 'Transport Company',
         });
-
-        setSelectedShipment({
-            title: post.title,
-            ...post,
-        });
-
+        setSelectedShipment(post);
         setChatOpen(true);
     };
 
     const handleCloseChat = () => {
+        dispatch(resetChat());
+        dispatch(setListingsPaneOpen(false));
         setChatOpen(false);
         setSelectedDriver(null);
         setSelectedShipment(null);
     };
     return (
         <>
-           
+
             <Grid item xs={12} md={6} lg={4} key={post.id}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flexGrow: 1 }}>

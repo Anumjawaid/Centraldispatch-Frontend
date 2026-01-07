@@ -13,11 +13,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login_user } from '../../Store/authenticationReducer';
-<<<<<<< HEAD
 import { connectSocket, disconnectSocket, emitSocketEvent, socket } from '../../utils/socketClient';
-=======
 import Logistics from "../../Components/Assets/Logistics.gif";
->>>>>>> 5d7d1ce55805ed7c8197b7fc47cc52104cc9dba2
 
 
 export default function LoginForm({ onLogin }) {
@@ -40,7 +37,6 @@ export default function LoginForm({ onLogin }) {
         });
     };
 
-<<<<<<< HEAD
         const handleSubmit = (e) => {
                 e.preventDefault();
                 setError(null);
@@ -50,18 +46,18 @@ export default function LoginForm({ onLogin }) {
                         const payload = res.payload || {};
                         // Support API that returns accessToken and message
                         const accessToken = payload.accessToken || payload.token || payload.data?.token;
-                        const successMessage = (payload.message || '').toLowerCase().includes('success');
-                        console.log('Login response payload:', payload);    
+                        const successMessage = (payload.message || '').toLowerCase().includes('success');  
                         if (accessToken || successMessage) {
                             try {
                                 if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
                                 if (accessToken) localStorage.setItem('token', accessToken);
                                 else if (payload.token) localStorage.setItem('token', payload.token);
-                                connectSocket();
+                                // connectSocket();
                             } catch (err) {
                                 // ignore storage errors
+                                console.log("LocalStorage error:", err);
                             }
-                            navigate('/userdashboard');
+                            navigate('/dashboard');
                         } else {
                             setError(payload.message || 'Unable to login. Please check credentials.');
                         }
@@ -69,40 +65,9 @@ export default function LoginForm({ onLogin }) {
                     .catch((err) => {
                         setError('Login failed. Please try again later.');
                         console.error(err);
-                        disconnectSocket();
+                        // disconnectSocket();
                     });
         };
-=======
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setError(null);
-        // Dispatch login and navigate on success
-        dispatch(login_user(formData))
-            .then((res) => {
-                const payload = res.payload || {};
-                // Support API that returns accessToken and message
-                const accessToken = payload.accessToken
-                const successMessage = (payload.message || '').toLowerCase().includes('success');
-
-                if (accessToken || successMessage) {
-                    try {
-                        if (accessToken) localStorage.setItem('token', accessToken);
-                        navigate('/dashboard');
-                    } catch (err) {
-                        // ignore storage errors
-                         setError(payload.message || 'Unable to login. Please check credentials.');
-                    }
-                    
-                } else {
-                    setError(payload.message || 'Unable to login. Please check credentials.');
-                }
-            })
-            .catch((err) => {
-                setError('Login failed. Please try again later.');
-                console.error(err);
-            });
-    };
->>>>>>> 5d7d1ce55805ed7c8197b7fc47cc52104cc9dba2
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

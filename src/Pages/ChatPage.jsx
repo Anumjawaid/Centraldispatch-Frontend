@@ -24,7 +24,8 @@ import { HeaderBackground, primaryColor } from '../Constants/Colors';
 import { connectSocket, disconnectSocket, emitSocketEvent, sendMessage, socket } from '../utils/socketClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchConversationMessages, fetchMyConversations } from '../utils/httpClient';
-import { addMessage, resetReadCount, setActiveConversation, setConversationMessages, setMyConversations } from '../Store/chatReducer';
+import { addMessage, resetChat, resetReadCount, setActiveConversation, setConversationMessages, setMyConversations } from '../Store/chatReducer';
+import Header from '../Components/Header';
 const MOCK_USER_ID = '6900f5dff7c93350d6b86d77'; // Mock current user ID
 // --- MOCK DATA MAPPING ---
 // In a real app, this data would come from a backend REST API
@@ -79,6 +80,7 @@ export default function ChatPage() {
       console.log("Fetched Conversations:", conversations);
       dispatch(setMyConversations(conversations.data || []));
     };
+    dispatch(resetChat());
     fetchConversations();
   }, []);
 
@@ -122,6 +124,7 @@ export default function ChatPage() {
       })
     );
     setDraft("");
+    console.log("Sending message:", null, newMessage.text, activeChat.postId, conversationId);
     sendMessage(null, newMessage.text, activeChat.postId, conversationId);
   };
 
@@ -140,6 +143,8 @@ export default function ChatPage() {
   };
 
   return (
+    <>
+    <Header/>
     <Box sx={{ minHeight: '100vh', background: '#f3f5fb', py: 4, px: { xs: 2, md: 4 } }}>
       <Box
         sx={{
@@ -451,5 +456,7 @@ export default function ChatPage() {
         </Box>
       </Box>
     </Box>
+    </>
+    
   );
 }

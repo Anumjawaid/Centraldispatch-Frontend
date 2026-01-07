@@ -37,8 +37,8 @@ export const emitSocketEvent = (event, payload, callback) => {
 export const sendMessage = (toUserId, text, postId,conversationId) => {
   emitSocketEvent('message:send', { toUserId, text, postId, conversationId });
 }
-export const startChat = (toUserId) => {
-  emitSocketEvent('chat:start', { otherUserId:toUserId });
+export const startChat = (toUserId,postId=null) => {
+  emitSocketEvent('chat:start', { otherUserId:toUserId, postId });
 }
 export const joinRoom = (conversationId) => {
   emitSocketEvent('conversation:join', { conversationId });

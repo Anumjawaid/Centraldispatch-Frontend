@@ -18,7 +18,9 @@ import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ImageIcon from '@mui/icons-material/Image';
 import PersonIcon from '@mui/icons-material/Person';
-
+import { sendMessage, startChat } from "../../utils/socketClient";
+import { useDispatch, useSelector } from 'react-redux';
+import { addMessage } from '../../Store/chatReducer';
 
 
 export default function ChatScreen({
@@ -26,45 +28,34 @@ export default function ChatScreen({
   onClose,
   driver,
   shipment,
+  toUserId,
 }) {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'driver',
-      text: 'Hello! I saw your listing and I am interested in transporting your vehicle. I have 10 years of experience in auto transport.',
-      timestamp: '10:30 AM',
-    },
-    {
-      id: 2,
-      sender: 'user',
-      text: 'Hi! Thank you for reaching out. Can you share your insurance information and DOT number?',
-      timestamp: '10:35 AM',
-    },
-    {
-      id: 3,
-      sender: 'driver',
-      text: 'Of course! My DOT number is 12345678. I will send you a copy of my insurance certificate.',
-      timestamp: '10:37 AM',
-    },
-  ]);
-
-  const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null);
-
+  //Direct Initializations
+  const ME = JSON.parse(localStorage.getItem("user") || "null")?.id;
   const driverName = driver?.name || 'Driver';
   const driverCompany = driver?.company;
   const shipmentTitle = shipment?.title;
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  //state based initializations
+  const dispatch = useDispatch();
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const { conversations, activeConversationId, chatLoader, isListingsPaneOpen } = useSelector((state) => state.chat || {});
+  const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
+
+  //hooks
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
+
+  //methods
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  const handleSendMessage1 = () => {
     if (message.trim() === '') return;
 
     const newMessage = {
@@ -93,6 +84,30 @@ export default function ChatScreen({
       };
       setMessages((prev) => [...prev, driverResponse]);
     }, 2000);
+  };
+  const handleSendMessage = (event) => {
+    event.preventDefault();
+    if (!message.trim() || !shipment) return;
+
+    const conversationId = activeConversationId;
+    const newMessage = {
+      id: `${conversationId}-${Date.now()}`,
+      sender: ME,
+      text: message.trim(),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    dispatch(
+      addMessage({
+        conversationId,
+        message: newMessage,
+        isActive: true,
+      })
+    );
+    setMessage("");
+    console.log("Sending message to user:", toUserId);
+    sendMessage(null, newMessage.text, shipment.id, conversationId);
+
   };
 
   const handleKeyPress = (e) => {
@@ -189,12 +204,12 @@ export default function ChatScreen({
           p: 3,
         }}
       >
-        {messages.map((msg) => (
+        {activeConversationId && conversations[activeConversationId]?.messages?.map((msg, index) => (
           <Box
-            key={msg.id}
+            key={index}
             sx={{
               display: 'flex',
-              justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+              justifyContent: msg.sender === ME ? 'flex-end' : 'flex-start',
               mb: 2,
             }}
           >
@@ -211,19 +226,19 @@ export default function ChatScreen({
               <Paper
                 sx={{
                   p: 2,
-                  bgcolor: msg.sender === 'user' ? 'primary.main' : 'white',
-                  color: msg.sender === 'user' ? 'white' : 'text.primary',
+                  bgcolor: msg.sender === ME ? 'primary.main' : 'white',
+                  color: msg.sender === ME ? 'white' : 'text.primary',
                   borderRadius: 2,
                   boxShadow: 1,
                 }}
               >
                 <Typography variant="body1">{msg.text}</Typography>
-                {msg.attachment && (
+                {msg?.attachment && (
                   <Box sx={{ mt: 1 }}>
-                    {msg.attachment.type === 'image' ? (
+                    {msg?.attachment?.type === 'image' ? (
                       <img
-                        src={msg.attachment.url}
-                        alt={msg.attachment.name}
+                        src={msg?.attachment?.url}
+                        alt={msg?.attachment?.name}
                         style={{
                           maxWidth: '100%',
                           borderRadius: 8,
@@ -233,7 +248,7 @@ export default function ChatScreen({
                     ) : (
                       <Chip
                         icon={<AttachFileIcon />}
-                        label={msg.attachment.name}
+                        label={msg?.attachment?.name}
                         size="small"
                         sx={{ mt: 1 }}
                       />
@@ -246,12 +261,12 @@ export default function ChatScreen({
                 color="text.secondary"
                 sx={{
                   display: 'block',
-                  textAlign: msg.sender === 'user' ? 'right' : 'left',
+                  textAlign: msg.sender === ME ? 'right' : 'left',
                   mt: 0.5,
                   mx: 1,
                 }}
               >
-                {msg.timestamp}
+                {msg.time}
               </Typography>
             </Box>
           </Box>
