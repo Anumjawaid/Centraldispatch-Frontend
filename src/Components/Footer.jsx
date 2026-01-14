@@ -1,19 +1,20 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import {HeaderBackground,HEADINGTXT } from '../Constants/Colors';
 
 export default function Footer() {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ bgcolor: '#1F2B56', color: 'white', py: 6 }}>
+    <Box sx={{ bgcolor: HeaderBackground, color: 'white', py: 6 }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Typography variant="h6" gutterBottom>
               Transport Platform
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+            <Typography variant="body2" sx={{  }}>
               Connecting shippers, carriers, and transporters in one easy place.
             </Typography>
           </Grid>

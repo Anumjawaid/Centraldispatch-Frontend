@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { PRIMARY, BACKGROUND, SECONDARY } from "../../Constants/Colors"
+import { PRIMARY, BACKGROUND, SECONDARY,HEADINGTXT } from "../../Constants/Colors"
 
 export const MainHeader = () => {
     const navigate = useNavigate();
@@ -24,8 +24,8 @@ export const MainHeader = () => {
                             gap: 4,
                         }}
                     >
-                        <Box sx={{ color: SECONDARY }}>
-                            <Typography variant="h3" fontWeight={700} mb={2} fontSize={"25px"}>
+                        <Box sx={{ color: HEADINGTXT }}>
+                            <Typography variant="h3" fontWeight={700} mb={2} fontSize={"25px"} color={SECONDARY}>
                                 Connecting Shippers, Carriers & Transporters
                             </Typography>
                             <Typography variant="h2" fontWeight={700} mb={2} fontSize={"40px"}>

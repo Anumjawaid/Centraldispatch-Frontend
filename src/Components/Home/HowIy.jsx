@@ -1,5 +1,9 @@
 import React from 'react';
 import { Container, Box, Typography, Divider } from '@mui/material';
+import { SECONDARY } from '../../Constants/Colors';
+import Shipper1 from "../Assets/shippers.jpg";
+import Shipper2 from '../Assets/shipper2.jpg';
+
 
 const steps = [
   { number: 1, heading:"Post Shipment",content: "Go to Create Listing, add your shipment details, and post it.You can see your post in the Listing section" },
@@ -33,7 +37,7 @@ const HowItWorks = () => {
                       width: 48,
                       height: 48,
                       borderRadius: '50%',
-                      backgroundColor: '#202C58',
+                      backgroundColor: SECONDARY,
                       color: '#fff',
                       display: 'flex',
                       alignItems: 'center',
@@ -45,7 +49,7 @@ const HowItWorks = () => {
                   >
                     {step.number}
                   </Box>
-                  <Typography variant="h6" fontWeight={600} fontSize={"28px"}>
+                  <Typography variant="h6" color={SECONDARY} fontWeight={600} fontSize={"28px"}>
                     {step.heading}
                   </Typography>
                 </Box>
@@ -75,7 +79,7 @@ const HowItWorks = () => {
             />
             {/* Main image */}
             <img
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+              src={Shipper1}
               alt="How it works"
               style={{ width: '100%', height: '100%', borderRadius: 24, objectFit: 'cover', position: 'relative', zIndex: 1 }}
             />
@@ -103,7 +107,7 @@ const HowItWorks = () => {
             />
             {/* Main image */}
             <img
-              src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80"
+              src={Shipper2}
               alt="Track shipment"
               style={{ width: '100%', height: '100%', borderRadius: 24, objectFit: 'cover', position: 'relative', zIndex: 1 }}
             />
@@ -121,7 +125,7 @@ const HowItWorks = () => {
                       width: 48,
                       height: 48,
                       borderRadius: '50%',
-                      backgroundColor: '#202C58',
+                      backgroundColor: SECONDARY,
                       color: '#fff',
                       display: 'flex',
                       alignItems: 'center',
@@ -133,7 +137,7 @@ const HowItWorks = () => {
                   >
                     {step.number}
                   </Box>
-                  <Typography variant="h6" fontWeight={600} fontSize={"28px"}>
+                  <Typography variant="h6" color={SECONDARY} fontWeight={600} fontSize={"28px"}>
                     {step.heading}
                   </Typography>
                 </Box>
@@ -146,7 +150,7 @@ const HowItWorks = () => {
           ))}
           <Box width="100%" display="flex" justifyContent="center" mt={4}>
             <button style={{
-              background: '#202C58',
+              background: SECONDARY,
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
