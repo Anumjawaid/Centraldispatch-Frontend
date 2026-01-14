@@ -12,12 +12,17 @@ import {
   useTheme,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useSelector, useDispatch } from 'react-redux';
+
 import { useNavigate } from 'react-router-dom';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 
 export default function Header({ isAuthenticated = false }) {
   const navigate = useNavigate();
+  const auth = useSelector((state) => state.authentication || {});
+  const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+  console.log(user, "user in header");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState(null);
@@ -73,7 +78,7 @@ export default function Header({ isAuthenticated = false }) {
     }
   }
   return (
-    <AppBar position="static" color="primary" elevation={2}>
+    <AppBar position="static" elevation={2}>
       <Toolbar>
         <LocalShippingIcon sx={{ mr: 1 }} />
         <Typography

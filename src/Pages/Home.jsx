@@ -14,10 +14,9 @@ export const Home = () => {
   
     return (
         <>
-            <DisclaimerModal />
             <Header />
-            {/* <HeroSection /> */}
             <MainHeader/>
+
             <HowItWorks />
             <br/>
             <ShipperInfo/>

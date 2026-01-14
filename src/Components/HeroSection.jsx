@@ -1,9 +1,7 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
-  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -16,64 +14,26 @@ export default function HeroSection() {
         justifyContent: "center",
       }}
     >
-      {/* Background YouTube Video */}
-      <Box
-        component="iframe"
-        src="https://youtu.be/B77UadFPfDE?si=LheQRlHb_xn2x61c"
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          border: "none",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Dark Overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          background: "linear-gradient(135deg,#202c58,#3e4c7c,#837d14)", // dark overlay
-          zIndex: 1,
-        }}
-      />
-
-      {/* Centered Content */}
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 2,
-          textAlign: "center",
-          color: "white",
-          maxWidth: "800px",
-          px: 3,
-        }}
-      >
-        <Typography variant="h2" sx={{ fontWeight: "bold", mb: 2 }}>
-          Take Control
-        </Typography>
-        <Typography variant="h6" sx={{ mb: 4 }}>
-          With the country’s largest self-managed auto transportation marketplace. <br />
-          From dispatch to drop-off, Central Dispatch gives you the power of choice at every step of the transportation process. <br />
-          So you can confidently find the ideal partner for any job, and run your business the way you need to.
-        </Typography>
-
-        {/* Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-          <Button variant="contained" color="secondary" size="large" onClick={() => navigate("/register")} sx={{ backgroundColor: "#B79F04" }}>
-            I'm a Shipper
-          </Button>
-          <Button variant="outlined" color="inherit" size="large"onClick={() => navigate("/register")}>
-            I'm a Carrier
-          </Button>
-        </Box>
-      </Box>
+     {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-5xl text-gray-900 mb-6">
+              Connecting Shippers, Carriers & Transporters
+            </h1>
+            <h2>
+              Welcome to Our Platform
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+             We connect shippers, carriers, and transporters in one easy place. Find trusted drivers, check their ratings, and book directly — all in a few clicks.
+            </p>
+            <div className="flex gap-4 justify-center">
+             
+             
+            </div>
+          </div>
+        </div>
+      </section>
     </Box>
   );
 }
