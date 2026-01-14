@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 // import Header from './Header';
 import PersonIcon from '@mui/icons-material/Person';
+import Header from '../Header';
 
 
 export default function ProfileSettings({ currentUser, setCurrentUser }) {
@@ -69,6 +70,9 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
   };
 
   return (
+    <>
+     <Header/>
+    
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
 
       <Container maxWidth="md" sx={{ py: 6 }}>
@@ -80,7 +84,7 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
         </Typography>
 
         {/* Profile Picture Section */}
-        <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+        {/* <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', mr: 3 }}>
               <PersonIcon sx={{ fontSize: 48 }} />
@@ -95,7 +99,7 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
               </Button>
             </Box>
           </Box>
-        </Paper>
+        </Paper> */}
 
         {/* Account Information */}
         <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
@@ -250,5 +254,6 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
         </Paper>
       </Container>
     </Box>
+    </>
   );
 }

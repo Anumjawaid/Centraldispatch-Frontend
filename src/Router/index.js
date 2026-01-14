@@ -27,7 +27,8 @@ export function AppRouter() {
                 <Routes>
                     {/* <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} /> */}
                     <Route path="/" element={<Home />} />
-                    <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    {/* <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginPage />} /> */}
                     <Route path="/register" element={<RegistrationPage />}></Route>
                     <Route path="/create-post" element={<AddPostsPage />}></Route>
                     <Route path="/userdashboard" element={<UserDashboard />}></Route>

@@ -10,7 +10,7 @@ export const MainHeader = () => {
         <>
             <Box
                 sx={{
-                    background: ` linear-gradient(135deg, ${BACKGROUND} 50%)`,
+                    background: ` linear-gradient(135deg, #FFFF 50%)`,
                     py: 8,
                 }}
             >

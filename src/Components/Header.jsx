@@ -12,21 +12,27 @@ import {
   useTheme,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useSelector, useDispatch } from 'react-redux';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
 import { useNavigate } from 'react-router-dom';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import { useSelector } from 'react-redux';
 
 
-export default function Header({ isAuthenticated = false }) {
+export default function Header() {
   const navigate = useNavigate();
+  let isAuthenticated = false;
   const auth = useSelector((state) => state.authentication || {});
   const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
-  console.log(user, "user in header");
+  const token = auth.token || localStorage.getItem('token');
+    if(token != null){
+      isAuthenticated = true;
+    }
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState(null);
   const [listingMenuAnchor, setListingMenuAnchor] = useState(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -44,6 +50,21 @@ export default function Header({ isAuthenticated = false }) {
     setListingMenuAnchor(null);
   };
 
+  const handleUserMenuOpen = (event) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/');
+    handleUserMenuClose();
+  };
+
   const menuItems = [
     { label: 'Home', path: '/' },
     { label: 'Listing & Status', hasSubmenu: true },
@@ -53,6 +74,7 @@ export default function Header({ isAuthenticated = false }) {
   ];
 
   const authenticatedItems = [
+    { label: 'Dashboard', path: '/dashboard' },
     { label: 'Profile Settings', path: '/profile-settings' },
     { label: 'Billing', path: '/billing' },
     { label: 'Chat', path: '/chat' },
@@ -60,10 +82,10 @@ export default function Header({ isAuthenticated = false }) {
 
   const listingSubmenu = [
     { label: 'Create Listing', path: '/create-post' },
-    { label: 'All Listings', path: '/listing-status?tab=listing' },
-    { label: 'Assigned', path: '/listing-status?tab=assigned' },
-    { label: 'Picked Up', path: '/listing-status?tab=pickedup' },
-    { label: 'Delivered', path: '/listing-status?tab=delivered' },
+    { label: 'All Listings', path: '/dashboard' },
+    { label: 'Assigned', path: '/dashboard' },
+    { label: 'Picked Up', path: '/dashboard' },
+    { label: 'Delivered', path: '/dashboard' },
     { label: 'Chat', path: '/chat' },
   ];
 
@@ -80,18 +102,17 @@ export default function Header({ isAuthenticated = false }) {
   return (
     <AppBar position="static" elevation={2}>
       <Toolbar>
-        <LocalShippingIcon sx={{ mr: 1 }} />
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: isMobile ? 1 : 0, mr: 4, cursor: 'pointer' }}
-          onClick={handleHomeNavigation}
-        >
-          Transport Platform
-        </Typography>
-
         {isMobile ? (
           <>
+            <LocalShippingIcon sx={{ mr: 1 }} />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, cursor: 'pointer' }}
+              onClick={handleHomeNavigation}
+            >
+              Transport Platform
+            </Typography>
             <IconButton
               size="large"
               edge="end"
@@ -141,73 +162,130 @@ export default function Header({ isAuthenticated = false }) {
                   {item.label}
                 </MenuItem>
               ))}
+              {isAuthenticated && (
+                <MenuItem
+                  onClick={() => {
+                    navigate('/dashboard');
+                    handleMenuClose();
+                  }}
+                >
+                  Dashboard
+                </MenuItem>
+              )}
+              {isAuthenticated && (
+                <MenuItem onClick={handleLogout}>
+                  Logout
+                </MenuItem>
+              )}
             </Menu>
           </>
         ) : (
-          <Box sx={{ flexGrow: 1, display: 'flex', gap: 1 }}>
-            <Button color="inherit" onClick={handleHomeNavigation}>
-              Home
-            </Button>
-            <Button
-              color="inherit"
-              onClick={handleListingMenuOpen}
-              aria-controls="listing-menu"
-              aria-haspopup="true"
-            >
-              Listing & Status
-            </Button>
-            <Menu
-              id="listing-menu"
-              anchorEl={listingMenuAnchor}
-              open={Boolean(listingMenuAnchor)}
-              onClose={handleListingMenuClose}
-            >
-              {listingSubmenu.map((item) => (
-                <MenuItem
-                  key={item.path}
-                  onClick={() => {
-                    navigate(item.path);
-                    handleListingMenuClose();
-                  }}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </Menu>
-            <Button color="inherit" onClick={() => navigate('/contact-support')}>
-              Contact & Support
-            </Button>
-            <Button color="inherit" onClick={() => navigate('/disclaimer')}>
-              Disclaimer
-            </Button>
-            <Button color="inherit" onClick={() => navigate('/registration-info')}>
-              Registration Info
-            </Button>
-            {isAuthenticated && (
-              <>
-                <Button color="inherit" onClick={() => navigate('/profile-settings')}>
-                  Profile Settings
-                </Button>
-                <Button color="inherit" onClick={() => navigate('/billing')}>
-                  Billing
-                </Button>
-              </>
-            )}
-          </Box>
-        )}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            {/* Left: Logo */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <LocalShippingIcon sx={{ mr: 1 }} />
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ cursor: 'pointer' }}
+                onClick={handleHomeNavigation}
+              >
+                Transport Platform
+              </Typography>
+            </Box>
 
-        {!isAuthenticated && !isMobile && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button color="inherit" variant="outlined" onClick={() => navigate('/login')}>
-              Login
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: '#f0f0f0' } }}
-              onClick={() => navigate('/register')}
-            >
-              Sign Up
-            </Button>
+            {/* Center: Nav Links */}
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button color="inherit" onClick={handleHomeNavigation}>
+                Home
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleListingMenuOpen}
+                aria-controls="listing-menu"
+                aria-haspopup="true"
+              >
+                Listing & Status
+              </Button>
+              <Menu
+                id="listing-menu"
+                anchorEl={listingMenuAnchor}
+                open={Boolean(listingMenuAnchor)}
+                onClose={handleListingMenuClose}
+              >
+                {listingSubmenu.map((item) => (
+                  <MenuItem
+                    key={item.path}
+                    onClick={() => {
+                      navigate(item.path);
+                      handleListingMenuClose();
+                    }}
+                  >
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+              <Button color="inherit" onClick={() => navigate('/contact-support')}>
+                Contact & Support
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/disclaimer')}>
+                Disclaimer
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/registration-info')}>
+                Registration Info
+              </Button>
+            </Box>
+
+            {/* Right: Auth */}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {isAuthenticated ? (
+                <>
+                 
+                  <IconButton
+                    color="inherit"
+                    onClick={handleUserMenuOpen}
+                    aria-controls="user-menu"
+                    aria-haspopup="true"
+                  >
+                    <AccountCircle />
+                  </IconButton>
+                  <Menu
+                    id="user-menu"
+                    anchorEl={userMenuAnchor}
+                    open={Boolean(userMenuAnchor)}
+                    onClose={handleUserMenuClose}
+                  >
+                    {authenticatedItems.map((item) => (
+                      <MenuItem
+                        key={item.path}
+                        onClick={() => {
+                          navigate(item.path);
+                          handleUserMenuClose();
+                        }}
+                      >
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                    <MenuItem onClick={handleLogout}>
+                      Logout
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <>
+                  <Button color="inherit" variant="outlined" onClick={() => navigate('/login')}>
+                    Login
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: '#f0f0f0' } }}
+                    onClick={() => navigate('/register')}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </Box>
           </Box>
         )}
       </Toolbar>
