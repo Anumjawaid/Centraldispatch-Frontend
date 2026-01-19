@@ -1,7 +1,8 @@
 import React from 'react';
-import { H1, PRIMARY, SECONDARY, p, background,HEADINGTXT, HeaderBackground,Dashboardbackground } from '../../Constants/Colors';
+import { H1, PRIMARY, SECONDARY, p, background, HEADINGTXT, HeaderBackground, Dashboardbackground } from '../../Constants/Colors';
 import { Container, Card, CardContent, Typography, Box } from "@mui/material";
-
+import Shipper1 from "../Assets/shippers.jpg";
+import Shipper2 from '../Assets/shipper2.jpg';
 const shipperSections = [
   {
     heading: 'For Shippers',
@@ -13,6 +14,7 @@ const shipperSections = [
     ],
     color: SECONDARY,
     icon: '🚚',
+    image: Shipper1,
   },
   {
     heading: 'For Carriers / Transporters',
@@ -23,6 +25,7 @@ const shipperSections = [
     ],
     color: SECONDARY,
     icon: '🛣️',
+    image: Shipper1,
   },
   {
     heading: 'Safety & Verification',
@@ -33,6 +36,7 @@ const shipperSections = [
     ],
     color: SECONDARY,
     icon: '✅',
+    image: Shipper2,
   },
   {
     heading: 'No Double Brokering',
@@ -43,6 +47,7 @@ const shipperSections = [
     ],
     color: SECONDARY,
     icon: '🚫',
+    image: Shipper2,
   },
 ];
 
@@ -55,73 +60,86 @@ const importantNotice = [
 
 const ShipperInfo = () => (
   <Box sx={{ width: '100%', backgroundColor: PRIMARY, py: 8 }}>
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
 
-      {/* Title */}
-      <Typography
-        variant="h3"
-        align="center"
-        fontWeight={700}
-        mb={4}
-        fontSize="38px"
-        color={Dashboardbackground}
-        sx={{ fontFamily: 'serif', letterSpacing: 1 }}
-      >
-        Shipper & Carrier Information
-      </Typography>
+    {/* Title */}
+    <Typography
+      variant="h3"
+      align="center"
+      fontWeight={700}
+      mb={4}
+      fontSize="38px"
+      color={Dashboardbackground}
+      sx={{ fontFamily: 'serif', letterSpacing: 1 }}
+    >
+      Shipper & Carrier Information
+    </Typography>
 
-      {/* Main Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
-        {shipperSections.map((section) => (
-          <Card
-            key={section.heading}
-            sx={{
-              borderRadius: 4,
-              boxShadow: '0 4px 24px rgba(32,44,88,0.10)',
-              background,
-              minHeight: 220,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              p: 2,
-              height: '100%',
-              flex: 1,
-            }}
-          >
-              <CardContent>
-                <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-                  <Typography fontSize={40} mb={1} color={PRIMARY}>{section.icon}</Typography>
-                  <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    color={section.color}
-                    align="center"
-                    fontSize="22px"
-                    mb={2}
-                    sx={{ fontFamily: 'serif' }}
-                  >
-                    {section.heading}
-                  </Typography>
-                </Box>
+    {/* Main Section */}
+    {Array.from({ length: Math.ceil(shipperSections.length / 2) }, (_, rowIndex) => (
+      <Box key={rowIndex} sx={{ display: 'flex', flexDirection: 'row', gap: 8, mb: rowIndex < Math.ceil(shipperSections.length / 2) - 1 ? 8 : 0, width: '100%' }}>
+          {shipperSections.slice(rowIndex * 2, rowIndex * 2 + 2).map((section, index) => (
+            <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 2, backgroundColor: "white", borderRadius: 4, p: 5 }}>
+              <Box sx={{ flex: 0.7, height: '250px' }}>
+                <img
+                  src={section.image}
+                  alt="How it works"
+                  style={{ width: '100%', height: '100%', borderRadius: 24, objectFit: 'cover', position: 'relative', zIndex: 1 }}
+                />
+              </Box>
+              <Box sx={{ flex: 1.3 }}>
+                <Card
+                  key={section.heading}
+                  sx={{
+                    borderRadius: 4,
+                    boxShadow: '0 4px 24px rgba(32,44,88,0.10)',
+                    background,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    height: '250px',
+                    p: 5,
+                  }}
+                >
+                  <CardContent>
+                    <Box display="flex" flexDirection="column" alignItems="flex-start">
+                      <Typography
+                        variant="h6"
+                        fontWeight={700}
+                        color={section.color}
+                        align="left"
+                        fontSize="26px"
+                        mb={2}
+                        sx={{ fontFamily: 'serif' }}
+                      >
+                        {section.icon + " " + section.heading}
+                      </Typography>
+                    </Box>
 
-                {section.items.map((item, i) => (
-                  <Typography
-                    key={i}
-                    variant="body1"
-                    color={HEADINGTXT}
-                    fontSize="17px"
-                    mb={1}
-                    align="center"
-                    sx={{ fontFamily: 'serif' }}
-                  >
-                    {item}
-                  </Typography>
-                ))}
-              </CardContent>
-            </Card>
-        ))}
-      </Box>
+                    {section.items.map((item, i) => (
+                      <Typography
+                        key={i}
+                        variant="body1"
+                        color={HEADINGTXT}
+                        fontSize="20px"
+                        mb={1}
+                        align="left"
+                        sx={{ fontFamily: 'serif' }}
+                      >
+                        ✅ {item}
+                      </Typography>
+                    ))}
+                  </CardContent>
+                </Card>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      ))}
+
+
+
 
 
     </Container>

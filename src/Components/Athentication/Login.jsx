@@ -70,10 +70,15 @@ export default function LoginForm({ onLogin }) {
         };
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Container maxWidth="lg">
-                <Grid container>
-                    {/* Left side - GIF/Animation */}
+        <Box sx={{
+            bgcolor: 'background.default',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 4
+        }}>
+                <Grid container spacing={0} sx={{ minHeight: '600px' }}>
+                    {/* Left side - Content */}
                     <Grid
                         item
                         xs={12}
@@ -84,6 +89,7 @@ export default function LoginForm({ onLogin }) {
                             alignItems: 'center',
                             justifyContent: 'center',
                             p: 4,
+                            minHeight: '600px'
                         }}
                     >
                     <Box sx={{ textAlign: 'center', color: 'white' }}>
@@ -96,7 +102,7 @@ export default function LoginForm({ onLogin }) {
                         <Box
                             sx={{
                                 width: '100%',
-                                maxWidth: 600,
+                                maxWidth: 400,
                                 height: 400,
                                 bgcolor: 'rgba(255,255,255,0.1)',
                                 borderRadius: 2,
@@ -115,8 +121,27 @@ export default function LoginForm({ onLogin }) {
                 </Grid>
 
                 {/* Right side - Login Form */}
-                <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
-                    <Paper elevation={3} sx={{ p: 6, maxWidth: 400, width: '100%' }}>
+                <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        p: 4,
+                        width:"700px",
+                        minHeight: '600px'
+                    }}
+                >
+                    <Paper 
+                        elevation={3} 
+                        sx={{ 
+                            p: 6, 
+                            width: '100%',
+                            mx: 'auto' // Center horizontally
+                        }}
+                    >
                             <Typography variant="h4" gutterBottom align="center" color="primary">
                                 Login
                             </Typography>
@@ -124,57 +149,90 @@ export default function LoginForm({ onLogin }) {
                                 Access your account
                             </Typography>
 
-                            <form onSubmit={handleSubmit}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Email"
-                                            name="email"
-                                            type="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Password"
-                                            name="password"
-                                            type="password"
-                                            value={formData.password}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        {/* Submit */}
-                                        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                            <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'stretch' }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Email"
+                                        name="email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        variant="outlined"
+                                    />
+                                    
+                                    <TextField
+                                        fullWidth
+                                        label="Password"
+                                        name="password"
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                        variant="outlined"
+                                    />
+
+                                    {/* Error Alert */}
+                                    {error && (
+                                        <Alert severity="error" sx={{ width: '100%' }}>
+                                            {error}
+                                        </Alert>
+                                    )}
+
+                                    {/* Submit Button - Clearly Separated */}
+                                    <Box sx={{
+                                        mt: 3,
+                                        pt: 2,
+                                        borderTop: '1px solid',
+                                        borderColor: 'divider',
+                                        textAlign: 'center',
+                                        width: '100%'
+                                    }}>
                                         <Button
                                             type="submit"
                                             variant="contained"
+                                            size="large"
                                             fullWidth
-                                            sx={{ py: 1.2, fontWeight: "bold" }}
+                                            sx={{
+                                                py: 2,
+                                                fontWeight: "bold",
+                                                fontSize: '1.2rem',
+                                                borderRadius: 3,
+                                                boxShadow: 3,
+                                                '&:hover': {
+                                                    boxShadow: 6,
+                                                    transform: 'translateY(-2px)',
+                                                    transition: 'all 0.3s ease'
+                                                }
+                                            }}
                                             disabled={loading}
                                         >
-                                            {loading ? <CircularProgress size={22} color="inherit" /> : 'Login'}
+                                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
                                         </Button>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography variant="body2" align="center">
+                                    </Box>
+
+                                    {/* Sign up link */}
+                                    <Box sx={{ textAlign: 'center', mt: 2, width: '100%' }}>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                             Don't have an account?{' '}
-                                            <Button onClick={() => navigate('/signup')} sx={{ textTransform: 'none' }}>
+                                            <Button
+                                                onClick={() => navigate('/register')}
+                                                sx={{
+                                                    textTransform: 'none',
+                                                    fontWeight: 'bold',
+                                                    textDecoration: 'underline'
+                                                }}
+                                            >
                                                 Sign up here
                                             </Button>
                                         </Typography>
-                                    </Grid>
-                                </Grid>
+                                    </Box>
+                                </Box>
                             </form>
                         </Paper>
                     </Grid>
                 </Grid>
-            </Container>
         </Box>
     );
 }
