@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Box,
     Container,
@@ -34,6 +34,7 @@ export default function CreatePost({ currentUser }) {
     const [submitting, setSubmitting] = useState(false);
     const [apiMessage, setApiMessage] = useState("");
     const [apiError, setApiError] = useState("");
+    const redirectTimeoutRef = useRef(null);
 
     const [formData, setFormData] = useState({
         // General Info
@@ -267,6 +268,12 @@ export default function CreatePost({ currentUser }) {
             const result = await dispatch(add_post(transformedData)).unwrap();
             setApiMessage(result.message || "Shipping quote submitted successfully!");
 
+            // Redirect to dashboard after short delay
+            if (redirectTimeoutRef.current) clearTimeout(redirectTimeoutRef.current);
+            redirectTimeoutRef.current = setTimeout(() => {
+                navigate('/dashboard');
+            }, 2000);
+
             // Reset form
             setFormData({
                 trailerType: 'ENCLOSED',
@@ -331,6 +338,14 @@ export default function CreatePost({ currentUser }) {
             setSubmitting(false);
         }
     };
+
+    useEffect(() => {
+        return () => {
+            if (redirectTimeoutRef.current) {
+                clearTimeout(redirectTimeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -1001,21 +1016,7 @@ export default function CreatePost({ currentUser }) {
                                             <Typography variant="body2">Contact: {formData.deliveryLocation.contactName}</Typography>
                                         </Paper>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Paper sx={{ p: 3, bgcolor: '#f5f5f5' }}>
-                                            <Typography variant="subtitle1" gutterBottom>
-                                                Vehicle Details
-                                            </Typography>
-                                            <Typography variant="body2">
-                                                {formData.vehiclesYear} {formData.vehiclesMake} {formData.vehiclesModel}
-                                            </Typography>
-                                            <Typography variant="body2">Type: {formData.vehiclesType}</Typography>
-                                            <Typography variant="body2">Color: {formData.vehiclesColor}</Typography>
-                                            <Typography variant="body2">VIN: {formData.vin || 'Not provided'}</Typography>
-                                            {formData.inoperable && <Typography variant="body2" color="warning.main">⚠️ Vehicle is inoperable</Typography>}
-                                            {formData.oversized && <Typography variant="body2" color="warning.main">⚠️ Vehicle is oversized</Typography>}
-                                        </Paper>
-                                    </Grid>
+                                    
                                 </Grid>
                             </Box>
                         )}
@@ -1024,15 +1025,17 @@ export default function CreatePost({ currentUser }) {
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Button
-                                disabled={activeStep === 0}
-                                onClick={handleBack}
-                                variant="outlined"
-                            >
-                                Back
-                            </Button>
+                                    type="button"
+                                    disabled={activeStep === 0}
+                                    onClick={handleBack}
+                                    variant="outlined"
+                                >
+                                    Back
+                                </Button>
                             <Box sx={{ display: 'flex', gap: 2 }}>
                                 {activeStep < steps.length - 1 ? (
                                     <Button
+                                        type="button"
                                         variant="contained"
                                         onClick={handleNext}
                                         color="primary"

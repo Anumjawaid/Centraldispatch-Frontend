@@ -208,7 +208,14 @@ function MainCard({ post }) {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button size="small" color="primary" onClick={() => navigate("/post")}>
+                        <Button
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                                const id = post._id || post.id;
+                                navigate(`/post?id=${id}`);
+                            }}
+                        >
                             View Details
                         </Button>
 

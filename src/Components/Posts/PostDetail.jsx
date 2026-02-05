@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Container,
@@ -15,6 +15,8 @@ import {
   TableRow,
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_post_by_id } from '../../Store/postReducer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -30,12 +32,26 @@ import HomeIcon from '@mui/icons-material/Home';
 export default function PostDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const post = location.state?.post;
+  const dispatch = useDispatch();
+  const postFromState = useSelector((state) => state.posts?.currentPost);
+  const loading = useSelector((state) => state.posts?.loading);
+
+  const postFromLocation = location.state?.post;
+  const queryId = new URLSearchParams(location.search).get('id');
+
+  // If a post wasn't provided via navigation state, fetch by id from query params
+  useEffect(() => {
+    if (!postFromLocation && queryId) {
+      dispatch(get_post_by_id(queryId));
+    }
+  }, [dispatch, postFromLocation, queryId]);
+
+  const post = postFromLocation || postFromState;
 
   if (!post) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography variant="h5">Post not found</Typography>
+        <Typography variant="h5">{loading ? 'Loading post...' : 'Post not found'}</Typography>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/dashboard')} sx={{ mt: 2 }}>
           Back to Dashboard
         </Button>
@@ -90,7 +106,9 @@ export default function PostDetailsPage() {
             </Box>
             <Chip
               label={post.status}
-              color={getStatusColor(post.status)}
+              // color={getStatusColor(post.status)}
+              color={"primary"}
+
               sx={{ px: 2, py: 2.5 }}
             />
           </Box>

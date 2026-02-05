@@ -58,7 +58,7 @@ export const get_posts = createAsyncThunk(
     async (params = {}, thunkApi) => {
         try {
             // attempt to read token from redux state, fallback to localStorage
-            
+
 
             const state = thunkApi.getState();
             const token = state?.authentication?.token || localStorage.getItem('token');
@@ -97,9 +97,15 @@ export const get_post_by_id = createAsyncThunk(
     "posts/get_post_by_id",
     async (id, thunkApi) => {
         try {
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log("Token:", token);
             const res = await fetch(`${POSTS}/${id}`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
             });
 
             if (!res.ok) throw new Error(`Failed to fetch post: ${res.status}`);
