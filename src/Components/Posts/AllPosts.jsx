@@ -54,7 +54,6 @@ export default function AllPosts() {
 
     return (
         <>
-            <Header />
             {/* Recent Posts */}
             <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
                 Your Active Posts

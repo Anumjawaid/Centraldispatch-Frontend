@@ -47,10 +47,7 @@ export default function Dashboard() {
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [selectedShipment, setSelectedShipment] = useState(null);
     useEffect(() => {
-        // Fetch user profile if logged in and user data is not present
-        // if (isLoggedIn && !user) {
-        // }
-        // console.log("Dispatching get_posts");
+        
         dispatch(resetChat());
     }, []);
 
@@ -69,7 +66,7 @@ export default function Dashboard() {
                             Welcome back, {user?.name || 'User'}!
                         </Typography>
                         <Typography variant="body1" color="text.secondary">
-                            {user?.companyName || 'Your Company'}
+                            {user?.companyLegalName || 'Your Company'}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 2 }}>

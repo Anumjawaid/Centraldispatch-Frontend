@@ -83,69 +83,6 @@ export default function AllListings() {
     return (
       <Grid container spacing={3}>
         <AllPosts />
-        {/* {listings.map((listing) => (
-          <Grid item xs={12} md={6} key={listing.id}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                  <Typography variant="h6">{listing.title}</Typography>
-                  <Chip
-                    label={status.charAt(0).toUpperCase() + status.slice(1)}
-                    color={
-                      status === 'listing' ? 'info' :
-                        status === 'assigned' ? 'warning' :
-                          status === 'pickedup' ? 'primary' :
-                            'success'
-                    }
-                    size="small"
-                  />
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  <strong>From:</strong> {listing.from}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  <strong>To:</strong> {listing.to}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  <strong>Price:</strong> ${listing.price}
-                </Typography>
-                {listing.driver && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>Driver:</strong> {listing.driver}
-                  </Typography>
-                )}
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  <strong>Date:</strong> {listing.date}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Button size="small" variant="outlined">
-                    View Details
-                  </Button>
-                  {status === 'listing' && (
-                    <Button size="small" variant="contained">
-                      Assign Driver
-                    </Button>
-                  )}
-                  {(status === 'assigned' || status === 'pickedup') && listing.driver && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      startIcon={<ChatIcon />}
-                      onClick={() => handleChatDriver(listing)}
-                    >
-                      Chat Driver
-                    </Button>
-                  )}
-                  {status === 'delivered' && (
-                    <Button size="small" variant="outlined" color="success">
-                      Leave Review
-                    </Button>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))} */}
       </Grid>
     );
   };

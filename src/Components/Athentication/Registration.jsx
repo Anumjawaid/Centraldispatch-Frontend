@@ -268,10 +268,10 @@ export default function SignupPage() {
                         onChange={handleChange}
                         label="Business Type"
                       >
-                        <MenuItem value="shipper">Shipper</MenuItem>
-                        <MenuItem value="carrier">Carrier</MenuItem>
-                        <MenuItem value="transporter">Transporter</MenuItem>
-                        <MenuItem value="both">Both Shipper & Carrier</MenuItem>
+                        <MenuItem value="Shipper">Shipper</MenuItem>
+                        <MenuItem value="Carrier">Carrier</MenuItem>
+                        <MenuItem value="Transporter">Transporter</MenuItem>
+                        <MenuItem value="Both">Both Shipper & Carrier</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>

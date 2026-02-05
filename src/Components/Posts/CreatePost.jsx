@@ -126,7 +126,7 @@ export default function CreatePost({ currentUser }) {
             if (targetSection === "vehicles") {
                 setFormData({
                     ...formData,
-                    vehicles: { ...formData.vehicless, [targetField]: value },
+                    vehicles: { ...formData.vehicles, [targetField]: value },
                 });
             } else {
                 setFormData({
@@ -149,11 +149,94 @@ export default function CreatePost({ currentUser }) {
         window.scrollTo(0, 0);
     };
 
+    // Transform form data to API format
+    const transformFormData = (data) => {
+        const typeMapping = {
+            residential: 'RESIDENCE',
+            business: 'BUSINESS',
+            dealership: 'DEALERSHIP',
+            auction: 'AUCTION',
+            port: 'PORT'
+        };
+
+        const vehicleTypeMapping = {
+            sedan: 'CAR',
+            suv: 'SUV',
+            truck: 'TRUCK',
+            van: 'VAN',
+            motorcycle: 'MOTORCYCLE',
+            boat: 'BOAT',
+            rv: 'RV',
+            other: 'OTHER'
+        };
+
+        const formatDateToISO = (dateString) => {
+            if (!dateString) return null;
+            const date = new Date(dateString);
+            return date.toISOString();
+        };
+
+        return {
+            trailerType: data.trailerType,
+            quotedPriceUsd: parseFloat(data.quotedPriceUsd),
+            agreedToTerms: data.agreedToTerms,
+            pickupLocation: {
+                type: typeMapping[data.pickupLocation.type] || data.pickupLocation.type.toUpperCase(),
+                name: data.pickupLocation.name,
+                addressLine: data.pickupLocation.addressLine,
+                city: data.pickupLocation.city,
+                stateOrProvince: data.pickupLocation.stateOrProvince,
+                postalCode: data.pickupLocation.postalCode,
+                country: data.pickupLocation.country,
+                contactName: data.pickupLocation.contactName,
+                contactEmail: data.pickupLocation.contactEmail,
+                contactPhone: data.pickupLocation.contactPhone,
+                contactCell: data.pickupLocation.contactCell,
+                buyerReferenceNumber: data.pickupLocation.buyerReferenceNumber,
+                twicRequired: data.pickupLocation.twicRequired
+            },
+            deliveryLocation: {
+                type: typeMapping[data.deliveryLocation.type] || data.deliveryLocation.type.toUpperCase(),
+                name: data.deliveryLocation.name,
+                addressLine: data.deliveryLocation.addressLine,
+                city: data.deliveryLocation.city,
+                stateOrProvince: data.deliveryLocation.stateOrProvince,
+                postalCode: data.deliveryLocation.postalCode,
+                country: data.deliveryLocation.country,
+                contactName: data.deliveryLocation.contactName,
+                contactEmail: data.deliveryLocation.contactEmail,
+                contactPhone: data.deliveryLocation.contactPhone,
+                contactCell: data.deliveryLocation.contactCell,
+                buyerReferenceNumber: data.deliveryLocation.buyerReferenceNumber,
+                twicRequired: data.deliveryLocation.twicRequired
+            },
+            vehicles: [
+                {
+                    vinAvailable: data.vehicles.vinAvailable === 'yes',
+                    vin: data.vehicles.vin || null,
+                    type: vehicleTypeMapping[data.vehicles.type] || data.vehicles.type.toUpperCase(),
+                    year: parseInt(data.vehicles.year),
+                    make: data.vehicles.make,
+                    model: data.vehicles.model,
+                    color: data.vehicles.color,
+                    lotNumber: data.vehicles.lotNumber,
+                    licensePlate: data.vehicles.licensePlate,
+                    licenseStateOrProvince: data.vehicles.licenseStateOrProvince,
+                    notes: data.vehicles.notes,
+                    inoperable: data.vehicles.inoperable,
+                    oversized: data.vehicles.oversized,
+                    availableDate: formatDateToISO(data.vehicles.availableDate),
+                    desiredDeliveryDate: formatDateToISO(data.vehicles.desiredDeliveryDate),
+                    expirationDate: formatDateToISO(data.vehicles.expirationDate)
+                }
+            ]
+        };
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setApiError("");
         setApiMessage("");
-        console.log(formData,"formData")
 
         // Validate required fields
         if (!formData.agreedToTerms) {
@@ -177,47 +260,68 @@ export default function CreatePost({ currentUser }) {
         setSubmitting(true);
 
         try {
-            const result = await dispatch(add_post(formData)).unwrap();
+            // Transform data to API format
+            const transformedData = transformFormData(formData);
+            console.log(transformedData, "transformedData");
+
+            const result = await dispatch(add_post(transformedData)).unwrap();
             setApiMessage(result.message || "Shipping quote submitted successfully!");
 
             // Reset form
             setFormData({
-                trailerType: "",
-                quotedPriceUsd: "",
+                trailerType: 'ENCLOSED',
+                quotedPriceUsd: '',
                 agreedToTerms: false,
                 pickupLocation: {
-                    type: "",
-                    name: "",
-                    addressLine: "",
-                    city: "",
-                    stateOrProvince: "",
-                    postalCode: "",
-                    country: "",
-                    contactName: "",
-                    contactEmail: "",
-                    contactPhone: "",
-                    contactCell: "",
-                    buyerReferenceNumber: "",
+                    type: 'residential',
+                    name: '',
+                    addressLine: '',
+                    city: '',
+                    stateOrProvince: '',
+                    postalCode: '',
+                    country: '',
+                    contactName: '',
+                    contactEmail: '',
+                    contactPhone: '',
+                    contactCell: '',
+                    buyerReferenceNumber: '',
                     twicRequired: false,
                 },
                 deliveryLocation: {
-                    type: "",
-                    name: "",
-                    addressLine: "",
-                    city: "",
-                    stateOrProvince: "",
-                    postalCode: "",
-                    country: "",
-                    contactName: "",
-                    contactEmail: "",
-                    contactPhone: "",
-                    contactCell: "",
-                    buyerReferenceNumber: "",
+                    type: 'residential',
+                    name: '',
+                    addressLine: '',
+                    city: '',
+                    stateOrProvince: '',
+                    postalCode: '',
+                    country: '',
+                    contactName: '',
+                    contactEmail: '',
+                    contactPhone: '',
+                    contactCell: '',
+                    buyerReferenceNumber: '',
                     twicRequired: false,
                 },
-                vehicles: [formData.vehicles],
-                
+                vehicles: {
+                    vinAvailable: 'yes',
+                    vin: '',
+                    type: '',
+                    year: '',
+                    make: '',
+                    model: '',
+                    color: '',
+                    lotNumber: '',
+                    licensePlate: '',
+                    licenseStateOrProvince: '',
+                    notes: '',
+                    inoperable: false,
+                    oversized: false,
+                    availableDate: '',
+                    desiredDeliveryDate: '',
+                    expirationDate: '',
+                },
             });
+            setActiveStep(0);
         } catch (error) {
             // error is the rejection payload from thunk (string or object)
             const errorMsg = typeof error === "string" ? error : error?.message || "Failed to submit quote";
@@ -676,6 +780,7 @@ export default function CreatePost({ currentUser }) {
                                             onChange={(e) => handleChange(e, "vehicles", "vin")}
                                             disabled={formData.vehicles.vinAvailable === 'no'}
                                             required={formData.vehicles.vinAvailable === 'yes'}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -707,6 +812,7 @@ export default function CreatePost({ currentUser }) {
                                             value={formData.vehicles.year}
                                             onChange={(e) => handleChange(e, "vehicles", "year")}
                                             required
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -717,6 +823,7 @@ export default function CreatePost({ currentUser }) {
                                             value={formData.vehicles.make}
                                             onChange={(e) => handleChange(e, "vehicles", "make")}
                                             required
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -727,6 +834,7 @@ export default function CreatePost({ currentUser }) {
                                             value={formData.vehicles.model}
                                             onChange={(e) => handleChange(e, "vehicles", "model")}
                                             required
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -736,6 +844,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleColor"
                                             value={formData.vehicles.color}
                                             onChange={(e) => handleChange(e, "vehicles", "color")}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -745,6 +854,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleLotNumber"
                                             value={formData.vehicles.lotNumber}
                                             onChange={(e) => handleChange(e, "vehicles", "lotNumber")}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -754,6 +864,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleLicensePlate"
                                             value={formData.vehicles.licensePlate}
                                             onChange={(e) => handleChange(e, "vehicles", "licensePlate")}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -763,6 +874,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleLicenseStateOrProvince"
                                             value={formData.vehicles.licenseStateOrProvince}
                                             onChange={(e) => handleChange(e, "vehicles", "licenseStateOrProvince")}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
@@ -775,6 +887,7 @@ export default function CreatePost({ currentUser }) {
                                             value={formData.vehicles.notes}
                                             onChange={(e) => handleChange(e, "vehicles", "notes")}
                                             placeholder="Any special notes about the vehicle condition, modifications, etc."
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -814,7 +927,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleAvailableDate"
                                             type="date"
                                             value={formData.vehicles.availableDate}
-                                            onChange={(e) => handleChange(e, "vehicle", "availableDate")}
+                                            onChange={(e) => handleChange(e, "vehicles", "availableDate")}
                                             InputLabelProps={{ shrink: true }}
                                             required
                                         />
@@ -826,7 +939,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleDesiredDeliveryDate"
                                             type="date"
                                             value={formData.vehicles.desiredDeliveryDate}
-                                            onChange={(e) => handleChange(e, "vehicle", "desiredDeliveryDate")}
+                                            onChange={(e) => handleChange(e, "vehicles", "desiredDeliveryDate")}
                                             InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
@@ -837,7 +950,7 @@ export default function CreatePost({ currentUser }) {
                                             name="vehicleExpirationDate"
                                             type="date"
                                             value={formData.vehicles.expirationDate}
-                                            onChange={(e) => handleChange(e, "vehicle", "expirationDate")}
+                                            onChange={(e) => handleChange(e, "vehicles", "expirationDate")}
                                             InputLabelProps={{ shrink: true }}
                                             helperText="Date when this listing expires"
                                         />
@@ -867,12 +980,12 @@ export default function CreatePost({ currentUser }) {
                                             <Typography variant="subtitle1" gutterBottom>
                                                 Pickup Location
                                             </Typography>
-                                            <Typography variant="body2">{formData.pickupLocationName}</Typography>
-                                            <Typography variant="body2">{formData.pickupAddressLine}</Typography>
+                                            <Typography variant="body2">{formData.pickupLocation.name}</Typography>
+                                            <Typography variant="body2">{formData.pickupLocation.addressLine}</Typography>
                                             <Typography variant="body2">
-                                                {formData.pickupCity}, {formData.pickupStateOrProvince} {formData.pickupPostalCode}
+                                                {formData.pickupLocation.city}, {formData.pickupLocation.stateOrProvince} {formData.pickupLocation.postalCode}
                                             </Typography>
-                                            <Typography variant="body2">Contact: {formData.pickupContactName}</Typography>
+                                            <Typography variant="body2">Contact: {formData.pickupLocation.contactName}</Typography>
                                         </Paper>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
@@ -880,12 +993,12 @@ export default function CreatePost({ currentUser }) {
                                             <Typography variant="subtitle1" gutterBottom>
                                                 Delivery Location
                                             </Typography>
-                                            <Typography variant="body2">{formData.deliveryLocationName}</Typography>
-                                            <Typography variant="body2">{formData.deliveryAddressLine}</Typography>
+                                            <Typography variant="body2">{formData.deliveryLocation.name}</Typography>
+                                            <Typography variant="body2">{formData.deliveryLocation.addressLine}</Typography>
                                             <Typography variant="body2">
-                                                {formData.deliveryCity}, {formData.deliveryStateOrProvince} {formData.deliveryPostalCode}
+                                                {formData.deliveryLocation.city}, {formData.deliveryLocation.stateOrProvince} {formData.deliveryLocation.postalCode}
                                             </Typography>
-                                            <Typography variant="body2">Contact: {formData.deliveryContactName}</Typography>
+                                            <Typography variant="body2">Contact: {formData.deliveryLocation.contactName}</Typography>
                                         </Paper>
                                     </Grid>
                                     <Grid item xs={12}>
