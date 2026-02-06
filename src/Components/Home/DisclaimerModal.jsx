@@ -61,7 +61,7 @@ const DisclaimerModal = ({ controlledOpen, onAgree, onClose }) => {
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <Typography variant="h5" fontWeight={700} mb={2} color={PRIMARY} align="center" sx={{ fontFamily: "serif" }}>
+        <Typography variant="h5" fontWeight={700} mb={2} color={background} align="center" sx={{ fontFamily: "serif" }}>
           Disclaimer
         </Typography>
         <Typography variant="body1" mb={2} sx={{ fontFamily: "serif" }}>
@@ -74,7 +74,7 @@ const DisclaimerModal = ({ controlledOpen, onAgree, onClose }) => {
           <Checkbox
             checked={checked}
             onChange={e => setChecked(e.target.checked)}
-            sx={{ color: "white" }}
+            sx={{ color: "white",backgroundColor: "transparent", "&.Mui-checked": { color: PRIMARY } }}
           />
           <Typography variant="body2" sx={{ fontFamily: "serif", color: background }}>
             By using this platform, all users agree to assume full responsibility for their interactions and transactions.
