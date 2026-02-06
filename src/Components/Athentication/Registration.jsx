@@ -41,7 +41,7 @@ export default function SignupPage() {
     email: "",
     confirmEmail: "",
     password: "",
-    businessType: "",
+    businessType: "Shipper",
     companyLegalName: "",
     country: "",
     state: "",

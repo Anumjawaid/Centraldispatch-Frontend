@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -13,19 +13,25 @@ import {
 // import Header from './Header';
 import PersonIcon from '@mui/icons-material/Person';
 import Header from '../Header';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_mydetails } from '../../Store/authenticationReducer';
 
 
-export default function ProfileSettings({ currentUser, setCurrentUser }) {
+export default function ProfileSettings() {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.authentication?.user) ||
+    (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+
   const [formData, setFormData] = useState({
-    name: currentUser?.name || 'John Doe',
-    email: currentUser?.email || 'john.doe@example.com',
-    companyName: currentUser?.companyName || 'ABC Transport Inc.',
-    phone: '555-123-4567',
-    address: '123 Main Street',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10001',
-    country: 'USA',
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    companyName: currentUser?.companyName || '',
+    phone: currentUser?.businessPhone || '',
+    address: currentUser?.companyAddress || '',
+    city: currentUser?.city || '',
+    state: currentUser?.state || '',
+    zipCode: currentUser?.zipCode || '',
+    country: currentUser?.country || '',
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -50,12 +56,7 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setCurrentUser({
-      ...currentUser,
-      name: formData.name,
-      email: formData.email,
-      companyName: formData.companyName,
-    });
+    // TODO: dispatch update profile action when available
     alert('Profile updated successfully!');
   };
 
@@ -68,6 +69,48 @@ export default function ProfileSettings({ currentUser, setCurrentUser }) {
     alert('Password changed successfully!');
     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
+
+  useEffect(() => {
+    let mounted = true;
+
+    
+      // otherwise fetch user details
+      dispatch(get_mydetails())
+        .unwrap()
+        .then((res) => {
+          if (!mounted) return;
+          const user = res.data || res.user || res;
+          console.log(user)
+          if (user) {
+            setFormData((prev) => ({
+              ...prev,
+              name: user.name || prev.name,
+              email: user.email || prev.email,
+              companyName: user.companyName || prev.companyName,
+              phone: user.businessPhone || prev.phone,
+              address: user.companyAddress || prev.address,
+              city: user.city || prev.city,
+              state: user.state || prev.state,
+              zipCode: user.zipCode || prev.zipCode,
+              country: user.country || prev.country,
+            }));
+            // persist to localStorage for consistency
+            try {
+              localStorage.setItem('user', JSON.stringify(user));
+            } catch (err) {
+              // ignore storage errors
+            }
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to load user details', err);
+        });
+    
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>

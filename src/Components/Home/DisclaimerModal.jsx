@@ -82,10 +82,10 @@ const DisclaimerModal = ({ controlledOpen, onAgree, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          color="primary"
+          color="white"
           disabled={!checked}
           onClick={handleAgree}
-          sx={{ backgroundColor: PRIMARY, color: SECONDARY, fontWeight: "bold", fontFamily: "serif" }}
+          sx={{ backgroundColor: PRIMARY, color: "whitesmoke", fontWeight: "bold", fontFamily: "serif" }}
         >
           I Agree
         </Button>

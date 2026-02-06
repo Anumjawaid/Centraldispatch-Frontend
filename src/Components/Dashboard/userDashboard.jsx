@@ -66,26 +66,10 @@ export default function Dashboard() {
                             Welcome back, {user?.name || 'User'}!
                         </Typography>
                         <Typography variant="body1" color="text.secondary">
-                            {user?.companyLegalName || 'Your Company'}
+                            {user?.companyLegalName +" Company Name" || 'Your Company'}
                         </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button
-                            variant="outlined"
-                            startIcon={<PersonIcon />}
-                            onClick={() => navigate('/profile-settings')}
-                        >
-                            Profile
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            startIcon={<LogoutIcon />}
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </Button>
-                    </Box>
+                   
                 </Box>
 
                 {/* Quick Actions */}
