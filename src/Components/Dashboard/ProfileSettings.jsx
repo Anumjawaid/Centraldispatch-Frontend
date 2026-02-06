@@ -13,19 +13,23 @@ import {
 // import Header from './Header';
 import PersonIcon from '@mui/icons-material/Person';
 import Header from '../Header';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { get_mydetails } from '../../Store/authenticationReducer';
 
 
 export default function ProfileSettings() {
   const dispatch = useDispatch();
+  let navigate = useNavigate();
   const currentUser = useSelector((state) => state.authentication?.user) ||
     (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
 
   const [formData, setFormData] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
-    companyName: currentUser?.companyName || '',
+    companyLegalName: currentUser?.companyLegalName || '',
     phone: currentUser?.businessPhone || '',
     address: currentUser?.companyAddress || '',
     city: currentUser?.city || '',
@@ -73,39 +77,39 @@ export default function ProfileSettings() {
   useEffect(() => {
     let mounted = true;
 
-    
-      // otherwise fetch user details
-      dispatch(get_mydetails())
-        .unwrap()
-        .then((res) => {
-          if (!mounted) return;
-          const user = res.data || res.user || res;
-          console.log(user)
-          if (user) {
-            setFormData((prev) => ({
-              ...prev,
-              name: user.name || prev.name,
-              email: user.email || prev.email,
-              companyName: user.companyName || prev.companyName,
-              phone: user.businessPhone || prev.phone,
-              address: user.companyAddress || prev.address,
-              city: user.city || prev.city,
-              state: user.state || prev.state,
-              zipCode: user.zipCode || prev.zipCode,
-              country: user.country || prev.country,
-            }));
-            // persist to localStorage for consistency
-            try {
-              localStorage.setItem('user', JSON.stringify(user));
-            } catch (err) {
-              // ignore storage errors
-            }
+
+    // otherwise fetch user details
+    dispatch(get_mydetails())
+      .unwrap()
+      .then((res) => {
+        if (!mounted) return;
+        const user = res.data || res.user || res;
+        console.log(user)
+        if (user) {
+          setFormData((prev) => ({
+            ...prev,
+            name: user.name || prev.name,
+            email: user.email || prev.email,
+            companyLegalName: user.companyLegalName || prev.companyLegalName,
+            phone: user.businessPhone || prev.phone,
+            address: user.companyAddress || prev.address,
+            city: user.city || prev.city,
+            state: user.state || prev.state,
+            zipCode: user.zipCode || prev.zipCode,
+            country: user.country || prev.country,
+          }));
+          // persist to localStorage for consistency
+          try {
+            localStorage.setItem('user', JSON.stringify(user));
+          } catch (err) {
+            // ignore storage errors
           }
-        })
-        .catch((err) => {
-          console.error('Failed to load user details', err);
-        });
-    
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load user details', err);
+      });
+
 
     return () => {
       mounted = false;
@@ -114,189 +118,181 @@ export default function ProfileSettings() {
 
   return (
     <>
-     <Header/>
-    
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Header />
 
-      <Container maxWidth="md" sx={{ py: 6 }}>
-        <Typography variant="h4" gutterBottom>
-          Profile Settings
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-          Manage your account information
-        </Typography>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
 
-        {/* Profile Picture Section */}
-        {/* <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', mr: 3 }}>
-              <PersonIcon sx={{ fontSize: 48 }} />
-            </Avatar>
-            <Box>
-              <Typography variant="h6">{formData.name}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {formData.companyName}
-              </Typography>
-              <Button size="small" sx={{ mt: 1 }}>
-                Change Photo
-              </Button>
-            </Box>
-          </Box>
-        </Paper> */}
 
-        {/* Account Information */}
-        <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Account Information
+        <Container maxWidth="md" sx={{ py: 6 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate('/dashboard')}
+            sx={{ mb: 3 }}
+          >
+            Back to Dashboard
+          </Button>
+          <Typography variant="h4" gutterBottom>
+            Profile Settings
           </Typography>
-          <Divider sx={{ mb: 3 }} />
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Company Name"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  label="City"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  label="State"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  label="Zip Code"
-                  name="zipCode"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary" size="large">
-                  Save Changes
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Paper>
-
-        {/* Change Password */}
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Change Password
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+            Manage your account information
           </Typography>
-          <Divider sx={{ mb: 3 }} />
-          <form onSubmit={handlePasswordSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Current Password"
-                  name="currentPassword"
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={handlePasswordChange}
-                  required
-                />
+
+          
+
+          {/* Account Information */}
+          <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Account Information
+            </Typography>
+            <Divider sx={{ mb: 3 }} />
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Company Name"
+                    name="companyLegalName"
+                    value={formData.companyLegalName}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="State"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="Zip Code"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary" size="large">
+                    Save Changes
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="New Password"
-                  name="newPassword"
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  required
-                />
+            </form>
+          </Paper>
+
+          {/* Change Password */}
+          <Paper elevation={3} sx={{ p: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Change Password
+            </Typography>
+            <Divider sx={{ mb: 3 }} />
+            <form onSubmit={handlePasswordSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Current Password"
+                    name="currentPassword"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="New Password"
+                    name="newPassword"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Confirm New Password"
+                    name="confirmPassword"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary" size="large">
+                    Update Password
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Confirm New Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary" size="large">
-                  Update Password
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Paper>
-      </Container>
-    </Box>
+            </form>
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 }
