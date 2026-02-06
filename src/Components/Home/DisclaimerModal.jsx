@@ -74,7 +74,7 @@ const DisclaimerModal = ({ controlledOpen, onAgree, onClose }) => {
           <Checkbox
             checked={checked}
             onChange={e => setChecked(e.target.checked)}
-            sx={{ color: PRIMARY }}
+            sx={{ color: "white" }}
           />
           <Typography variant="body2" sx={{ fontFamily: "serif", color: background }}>
             By using this platform, all users agree to assume full responsibility for their interactions and transactions.
