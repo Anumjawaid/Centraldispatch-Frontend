@@ -1,39 +1,37 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Chip,
-  Divider,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  Alert,
-  Snackbar,
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
+    Box,
+    Container,
+    Typography,
+    Paper,
+    Grid,
+    Chip,
+    Divider,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemAvatar,
+    Avatar,
+    Alert,
+    Snackbar,
+    IconButton,
+    Menu,
+    MenuItem,
+    ListItemIcon,
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { get_post_by_id, get_carriers } from '../../Store/postReducer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -50,9 +48,22 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_post_by_id } from '../Store/postReducer';
 
-export default function PostDetailsPage() {
-  const navigate = useNavigate();
+
+// Mock dispatcher data
+const mockDispatchers = [
+    { id: '1', name: 'John Smith', email: 'john.smith@dispatch.com', phone: '(555) 123-4567', activeLoads: 12 },
+    { id: '2', name: 'Sarah Johnson', email: 'sarah.j@dispatch.com', phone: '(555) 234-5678', activeLoads: 8 },
+    { id: '3', name: 'Michael Brown', email: 'michael.b@dispatch.com', phone: '(555) 345-6789', activeLoads: 15 },
+    { id: '4', name: 'Emily Davis', email: 'emily.d@dispatch.com', phone: '(555) 456-7890', activeLoads: 5 },
+    { id: '5', name: 'David Wilson', email: 'david.w@dispatch.com', phone: '(555) 567-8901', activeLoads: 10 },
+    { id: '6', name: 'Jennifer Martinez', email: 'jennifer.m@dispatch.com', phone: '(555) 678-9012', activeLoads: 7 },
+];
+
+export default function Test() {
+    const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
     const postFromState = useSelector((state) => state.posts?.currentPost);
@@ -60,13 +71,6 @@ export default function PostDetailsPage() {
     const postFromLocation = location.state?.post;
     const queryId = new URLSearchParams(location.search).get('id');
     const post = postFromLocation || postFromState;
-    const mockDispatchers = [
-   
-];
-
-    const carriers = useSelector((state) => state.posts?.carriers || []);
-    console.log(carriers, "carriers in post details");
-    const [searchPerformed, setSearchPerformed] = useState(false);
 
     // If a post wasn't provided via navigation state, fetch by id from query params
     useEffect(() => {
@@ -599,39 +603,23 @@ export default function PostDetailsPage() {
                         Assign Dispatcher
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', mb: 2 ,mt:3}}>
-                            <br />
-                            <TextField
-                                label="Search Dispatcher"
-                                placeholder="Search by name or email..."
-                                variant="outlined"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                InputProps={{
-                                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-                                }}
-                                sx={{ flex: 1 }}
-                            />
-                            <Button
-                                variant="contained"
-                                startIcon={<AssignmentIndIcon />}
-                                onClick={() => {
-                                    dispatch(get_carriers({ companyName: searchQuery }));
-                                    setSearchPerformed(true);
-                                }}
-                                sx={{ bgcolor: '#1447E6', whiteSpace: 'nowrap' }}
-                            >
-                                Search Dispatcher
-                            </Button>
-                        </Box>
-                        {
-                            // If carriers returned from API, show them; if a search was performed and carriers empty, show no-results message; otherwise fall back to mockDispatchers
-                        }
-                        {carriers && carriers.length > 0 ? (
+                        <TextField
+                            label="Search Dispatcher"
+                            placeholder="Search by name or email..."
+                            variant="outlined"
+                            fullWidth
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                            }}
+                            sx={{ mb: 2 }}
+                        />
+                        {filteredDispatchers.length > 0 ? (
                             <List sx={{ maxHeight: 400, overflow: 'auto' }}>
-                                {carriers.map((dispatcher) => (
+                                {filteredDispatchers.map((dispatcher) => (
                                     <ListItem
-                                        key={dispatcher.id || dispatcher._id}
+                                        key={dispatcher.id}
                                         disablePadding
                                         sx={{ mb: 1 }}
                                     >
@@ -652,14 +640,14 @@ export default function PostDetailsPage() {
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
-                                                primary={dispatcher.name || dispatcher.companyName || 'Unnamed'}
+                                                primary={dispatcher.name}
                                                 secondary={
                                                     <>
                                                         <Typography variant="body2" component="span" display="block">
-                                                            {dispatcher.email || dispatcher.contactEmail || ''}
+                                                            {dispatcher.email}
                                                         </Typography>
                                                         <Typography variant="body2" component="span" display="block">
-                                                            {dispatcher.phone || dispatcher.contactPhone || ''} {dispatcher.activeLoads ? ` • ${dispatcher.activeLoads} active loads` : ''}
+                                                            {dispatcher.phone} • {dispatcher.activeLoads} active loads
                                                         </Typography>
                                                     </>
                                                 }
@@ -668,13 +656,11 @@ export default function PostDetailsPage() {
                                     </ListItem>
                                 ))}
                             </List>
-                        ) : searchPerformed ? (
-                            <Box sx={{ py: 4, textAlign: 'center' }}>
-                                <Typography color="text.secondary">No carriers found matching your search</Typography>
-                            </Box>
                         ) : (
                             <Box sx={{ py: 4, textAlign: 'center' }}>
-                                <Typography color="text.secondary">No dispatchers found matching your search</Typography>
+                                <Typography color="text.secondary">
+                                    No dispatchers found matching your search
+                                </Typography>
                             </Box>
                         )}
                     </DialogContent>

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { POSTS } from '../Constants/URL'
+import { GET_CARRIER, POSTS } from '../Constants/URL'
 
 let initialState = {
 
@@ -148,6 +148,37 @@ export const delete_post = createAsyncThunk(
         }
     }
 );
+
+
+// Assign & Carriers
+export const get_carriers = createAsyncThunk(
+    "get_carriers",
+    async (data, thunkApi) => {
+        try {
+            // attempt to read token from redux state, fallback to localStorage
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log(data, "data in get carriers thunk");
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify(data),
+            };
+
+            const res = await fetch(GET_CARRIER, requestOptions);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ message: res.statusText }));
+                return thunkApi.rejectWithValue(err.message || `Failed to get carriers: ${res.status}`);
+            }
+            return await res.json();
+        } catch (error) {
+            return thunkApi.rejectWithValue(error.message || 'Network error');
+        }
+    }
+)
 export const postsSlice = createSlice({
     name: "posts",
     initialState,
@@ -261,6 +292,25 @@ export const postsSlice = createSlice({
                 state.loading = false;
                 state.status = "rejected";
                 state.message = action.payload || "Failed to delete post";
+            });
+             builder
+            .addCase(get_carriers.pending, (state) => {
+                state.loading = true;
+                state.status = "pending";
+                state.message = "";
+            })
+            .addCase(get_carriers.fulfilled, (state, action) => {
+                state.loading = false;
+                state.status = "fulfilled";
+                state.message = action.payload?.message || "Carriers fetched successfully";
+                if (action.payload?.data) {
+                    state.carriers = action.payload.data;
+                }
+            })
+            .addCase(get_carriers.rejected, (state, action) => {
+                state.loading = false;
+                state.status = "rejected";
+                state.message = action.payload || "Failed to get carriers";
             });
     },
 });
