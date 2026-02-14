@@ -63,6 +63,7 @@ export const get_posts = createAsyncThunk(
             const state = thunkApi.getState();
             const token = state?.authentication?.token || localStorage.getItem('token');
             console.log("Token:", token);
+            console.log(params,"params");
 
             // Build query string dynamically
             const queryString = new URLSearchParams(

@@ -18,6 +18,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useDispatch, useSelector } from 'react-redux';
 import AllPosts from './AllPosts';
+import FilterSidebar from './FilterSidebar';
 
 import { startChat } from "../../utils/socketClient";
 import { get_posts } from '../../Store/postReducer';
@@ -91,35 +92,43 @@ export default function AllListings() {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <Header isAuthenticated={true} />
 
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/dashboard')}
-          sx={{ mb: 3 }}
-        >
-          Back to Dashboard
-        </Button>
-        <Typography variant="h4" gutterBottom>
-          Listing & Status
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-          Manage and track your shipment listings
-        </Typography>
-
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
-            <Tab label="Listing" value="listing" />
-            <Tab label="Assigned" value="assigned" />
-            <Tab label="Picked Up" value="pickedup" />
-            <Tab label="Delivered" value="delivered" />
-          </Tabs>
+      <Box sx={{ display: 'flex', gap: 3, px: 2, py: 4 }}>
+        {/* Fixed Sidebar - does not move with scroll */}
+        <Box sx={{ flexShrink: 0 }}>
+          <FilterSidebar />
         </Box>
 
-        {activeTab === 'listing' && renderListings(mockListings.listing, 'listing')}
-        {activeTab === 'assigned' && renderListings(mockListings.assigned, 'assigned')}
-        {activeTab === 'pickedup' && renderListings(mockListings.pickedup, 'picked up')}
-        {activeTab === 'delivered' && renderListings(mockListings.delivered, 'delivered')}
-      </Container>
+        {/* Main Content */}
+        <Container maxWidth="lg" sx={{ py: 2, flex: 1, ml: '320px' }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate('/dashboard')}
+            sx={{ mb: 3 }}
+          >
+            Back to Dashboard
+          </Button>
+          <Typography variant="h4" gutterBottom>
+            Listing & Status
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+            Manage and track your shipment listings
+          </Typography>
+
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+            <Tabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
+              <Tab label="Listing" value="listing" />
+              <Tab label="Assigned" value="assigned" />
+              <Tab label="Picked Up" value="pickedup" />
+              <Tab label="Delivered" value="delivered" />
+            </Tabs>
+          </Box>
+
+          {activeTab === 'listing' && renderListings(mockListings.listing, 'listing')}
+          {activeTab === 'assigned' && renderListings(mockListings.assigned, 'assigned')}
+          {activeTab === 'pickedup' && renderListings(mockListings.pickedup, 'picked up')}
+          {activeTab === 'delivered' && renderListings(mockListings.delivered, 'delivered')}
+        </Container>
+      </Box>
 
       {chatOpen && (
         <ChatScreen

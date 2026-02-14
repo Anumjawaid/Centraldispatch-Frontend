@@ -1,157 +1,199 @@
 import React, { useState } from 'react';
-import { Box, Grid, Paper, TextField, MenuItem, Button, Typography, CircularProgress, Divider } from '@mui/material';
+import { Box, Paper, TextField, MenuItem, Button, Typography, Chip } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { get_posts } from '../../Store/postReducer';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 30 }).map((_, i) => String(currentYear - i));
 
-const trailerOptions = [
-  { value: '', label: 'Any' },
-  { value: 'Open', label: 'Open' },
-  { value: 'Closed', label: 'Closed' },
-];
-
-const stateOptions = [
-  { value: '', label: 'Any' },
-  { value: 'Pickup', label: 'Pickup' },
-  { value: 'Delivery', label: 'Delivery' },
-];
+const trailerTypes = ['OPEN', 'CLOSED', 'FLATBED', 'ENCLOSED'];
+const states = ['CA', 'TX', 'NY', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC', 'MI'];
 
 const FilterSidebar = () => {
   const dispatch = useDispatch();
   const postsState = useSelector((s) => s.posts || {});
 
   const [filters, setFilters] = useState({
-    fromYear: '',
-    toYear: '',
+    from: '',
+    to: '',
     trailerType: '',
     make: '',
     model: '',
     state: '',
-    vehicleYear: '',
+    year: '',
   });
 
   const [searched, setSearched] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((f) => ({ ...f, [name]: value }));
-  };
+  const handleFilterChange = (name, value) => {
+    const updatedFilters = { ...filters, [name]: value };
+    setFilters(updatedFilters);
 
-  const handleSearch = () => {
-    const params = {
-      fromYear: filters.fromYear,
-      toYear: filters.toYear,
-      trailerType: filters.trailerType,
-      make: filters.make,
-      model: filters.model,
-      state: filters.state,
-      vehicleYear: filters.vehicleYear,
-    };
+    // Build params object from updated filters (only include non-empty values)
+    const params = Object.keys(updatedFilters).reduce((acc, key) => {
+      if (updatedFilters[key]) acc[key] = updatedFilters[key];
+      return acc;
+    }, {});
+
+    // Dispatch API call immediately when filter changes
     dispatch(get_posts(params));
     setSearched(true);
   };
 
-  const handleReset = () => {
-    setFilters({ fromYear: '', toYear: '', trailerType: '', make: '', model: '', state: '', vehicleYear: '' });
+  const getActiveFilterCount = () => {
+    return Object.values(filters).filter((v) => v && v !== "").length;
+  };
+
+  const clearFilters = () => {
+    setFilters({ from: '', to: '', trailerType: '', make: '', model: '', state: '', year: '' });
+    dispatch(get_posts()); // Fetch all posts when filters are cleared
     setSearched(false);
   };
 
-  const hasFilters = Object.values(filters).some((v) => v && v !== "");
-
   return (
-    <Box sx={{ width: '100%', py: 4 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Filters</Typography>
+    <Paper
+      elevation={2}
+      sx={{
+        width: 280,
+        p: 3,
+        borderRadius: 2,
+        height: 'fit-content',
+        position: 'fixed',
+        left: 16,
+        top: 100,
+        overflowY: 'auto',
+        maxHeight: 'calc(100vh - 120px)',
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+        <FilterListIcon color="primary" />
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Filters
+        </Typography>
+        {getActiveFilterCount() > 0 && (
+          <Chip
+            label={getActiveFilterCount()}
+            size="small"
+            color="primary"
+            sx={{ height: 20, fontSize: '0.75rem' }}
+          />
+        )}
+      </Box>
 
-            <TextField select fullWidth label="From (Year)" name="fromYear" value={filters.fromYear} onChange={handleChange} sx={{ mb: 2 }}>
-              <MenuItem value="">Any</MenuItem>
-              {years.map((y) => (
-                <MenuItem key={y} value={y}>{y}</MenuItem>
-              ))}
-            </TextField>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <TextField
+          label="From (Year)"
+          select
+          size="small"
+          fullWidth
+          value={filters.from}
+          onChange={(e) => handleFilterChange('from', e.target.value)}
+        >
+          <MenuItem value="">
+            <em>Select Year</em>
+          </MenuItem>
+          {years.map(year => (
+            <MenuItem key={year} value={year}>{year}</MenuItem>
+          ))}
+        </TextField>
 
-            <TextField select fullWidth label="To (Year)" name="toYear" value={filters.toYear} onChange={handleChange} sx={{ mb: 2 }}>
-              <MenuItem value="">Any</MenuItem>
-              {years.map((y) => (
-                <MenuItem key={y} value={y}>{y}</MenuItem>
-              ))}
-            </TextField>
+        <TextField
+          label="To (Year)"
+          select
+          size="small"
+          fullWidth
+          value={filters.to}
+          onChange={(e) => handleFilterChange('to', e.target.value)}
+        >
+          <MenuItem value="">
+            <em>Select Year</em>
+          </MenuItem>
+          {years.map(year => (
+            <MenuItem key={year} value={year}>{year}</MenuItem>
+          ))}
+        </TextField>
 
-            <TextField select fullWidth label="Trailer Type" name="trailerType" value={filters.trailerType} onChange={handleChange} sx={{ mb: 2 }}>
-              {trailerOptions.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-              ))}
-            </TextField>
+        <TextField
+          label="Trailer Type"
+          select
+          size="small"
+          fullWidth
+          value={filters.trailerType}
+          onChange={(e) => handleFilterChange('trailerType', e.target.value)}
+        >
+          <MenuItem value="">
+            <em>All Types</em>
+          </MenuItem>
+          {trailerTypes.map(type => (
+            <MenuItem key={type} value={type}>{type}</MenuItem>
+          ))}
+        </TextField>
 
-            <TextField fullWidth label="Make" name="make" value={filters.make} onChange={handleChange} sx={{ mb: 2 }} />
-            <TextField fullWidth label="Model" name="model" value={filters.model} onChange={handleChange} sx={{ mb: 2 }} />
+        <TextField
+          label="Make"
+          size="small"
+          fullWidth
+          placeholder="e.g., Toyota"
+          value={filters.make}
+          onChange={(e) => handleFilterChange('make', e.target.value)}
+        />
 
-            <TextField select fullWidth label="State" name="state" value={filters.state} onChange={handleChange} sx={{ mb: 2 }}>
-              {stateOptions.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-              ))}
-            </TextField>
+        <TextField
+          label="Model"
+          size="small"
+          fullWidth
+          placeholder="e.g., Camry SE"
+          value={filters.model}
+          onChange={(e) => handleFilterChange('model', e.target.value)}
+        />
 
-            <TextField select fullWidth label="Year" name="vehicleYear" value={filters.vehicleYear} onChange={handleChange} sx={{ mb: 2 }}>
-              <MenuItem value="">Any</MenuItem>
-              {years.map((y) => (
-                <MenuItem key={y} value={y}>{y}</MenuItem>
-              ))}
-            </TextField>
+        <TextField
+          label="State"
+          select
+          size="small"
+          fullWidth
+          value={filters.state}
+          onChange={(e) => handleFilterChange('state', e.target.value)}
+        >
+          <MenuItem value="">
+            <em>All States</em>
+          </MenuItem>
+          {states.map(state => (
+            <MenuItem key={state} value={state}>{state}</MenuItem>
+          ))}
+        </TextField>
 
-            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-              <Button variant="contained" fullWidth onClick={handleSearch}>Search</Button>
-              <Button variant="outlined" fullWidth onClick={handleReset}>Reset</Button>
-            </Box>
-          </Paper>
-        </Grid>
+        <TextField
+          label="Year"
+          select
+          size="small"
+          fullWidth
+          value={filters.year}
+          onChange={(e) => handleFilterChange('year', e.target.value)}
+        >
+          <MenuItem value="">
+            <em>All Years</em>
+          </MenuItem>
+          {years.map(year => (
+            <MenuItem key={year} value={year}>{year}</MenuItem>
+          ))}
+        </TextField>
 
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, minHeight: 400, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Results</Typography>
-            <Divider sx={{ mb: 2 }} />
-
-            {!hasFilters && !searched && (
-              <Box sx={{ py: 8, textAlign: 'center' }}>
-                <Typography variant="body1">Use the filters to get results.</Typography>
-              </Box>
-            )}
-
-            {postsState.loading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                <CircularProgress />
-              </Box>
-            )}
-
-            {hasFilters && !postsState.loading && (
-              <Box>
-                {(postsState.posts || []).length === 0 ? (
-                  <Box sx={{ py: 6, textAlign: 'center' }}>
-                    <Typography variant="body1">No results found for selected filters.</Typography>
-                  </Box>
-                ) : (
-                  <Grid container spacing={2}>
-                    {(postsState.posts || []).map((post, i) => (
-                      <Grid item xs={12} md={6} key={i}>
-                        <Paper sx={{ p: 2, borderRadius: 2 }}>
-                          <Typography sx={{ fontWeight: 700 }}>{post.title || post.trailerType || 'Shipment'}</Typography>
-                          <Typography variant="body2" sx={{ color: '#6b7280' }}>{post.price ? `$${post.price}` : ''}</Typography>
-                          <Typography variant="body2" sx={{ mt: 1 }}>{post.notes}</Typography>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                )}
-              </Box>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Box>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          startIcon={<ClearIcon />}
+          onClick={clearFilters}
+          disabled={getActiveFilterCount() === 0}
+          sx={{ mt: 1 }}
+        >
+          Clear All
+        </Button>
+      </Box>
+    </Paper>
   );
 };
 
