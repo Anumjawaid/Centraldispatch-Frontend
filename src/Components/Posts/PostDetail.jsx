@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { get_post_by_id, get_carriers } from '../../Store/postReducer';
+import { get_post_by_id, get_carriers, update_post } from '../../Store/postReducer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -108,7 +108,7 @@ export default function PostDetailsPage() {
     const handleAssignDispatcher = (dispatcher) => {
         setSelectedDispatcher(dispatcher);
         setAssignModalOpen(false);
-        setSnackbarMessage(`Successfully assigned dispatcher: ${dispatcher.name}`);
+        setSnackbarMessage(`Successfully selected dispatcher: ${dispatcher.name}`);
         setSnackbarOpen(true);
     };
 
@@ -249,6 +249,23 @@ export default function PostDetailsPage() {
                                     </Typography>
                                 </Box>
                             </Box>
+
+                            {post.status !== 'assigned' && (
+                                <Button
+                                    variant="outlined"
+                                    sx={{ mt: 2 }}
+                                    onClick={async () => {
+                                        const postId = post._id || post.id;
+                                        if (!postId) return;
+                                        await dispatch(update_post({ id: postId, data: { status: 'assigned' } }));
+                                        dispatch(get_post_by_id(postId));
+                                        setSnackbarMessage('Post marked as assigned');
+                                        setSnackbarOpen(true);
+                                    }}
+                                >
+                                    Mark as Assigned
+                                </Button>
+                            )}
                         </Box>
                     </Paper>
                 )}

@@ -12,6 +12,7 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Pagination,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -19,7 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ChatScreen from '../Chat/ChatScreen';
-import { get_posts } from '../../Store/postReducer';
+import { get_posts, update_post } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
 import { resetChat, setListingsPaneOpen } from '../../Store/chatReducer';
@@ -32,10 +33,32 @@ export default function AllPosts() {
 
     const postsState = useSelector((state) => state.posts || {});
     // console.log(postsState, "posts in all posts");
-    const posts = postsState.posts.rows || [];
+    const postsData = postsState.posts || {};
+    console.log(postsData, "postsData in all posts");
+    const posts = postsData.rows || [];
     const auth = useSelector((state) => state.authentication || {});
     const dispatch = useDispatch();
     // console.log(auth, "auth in dashboard");
+
+    const [page, setPage] = useState(1);
+
+    const pageSize = postsData.pageSize || postsData.limit || 20;
+    const totalItems = postsData.total || 0;
+    const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(totalItems / pageSize)) : 1;
+    console.log(page, pageSize, totalItems, totalPages, "pagination info in all posts");
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        dispatch(get_posts({ page: value }));
+    };
+
+    // Keep local page in sync when the API returns a page value
+    useEffect(() => {
+        const apiPage = postsData.page || postsData.currentPage;
+        if (apiPage && apiPage !== page) {
+            setPage(apiPage);
+        }
+    }, [postsData.page, postsData.currentPage, page]);
 
     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
     const token = auth.token || localStorage.getItem('token');
@@ -55,14 +78,23 @@ export default function AllPosts() {
     return (
         <>
             {/* Recent Posts */}
-            <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-                Your Active Posts
-            </Typography>
+            
+               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        color="primary"
+                    />
+                </Box>
             <Grid container spacing={3}>
+                
                 {posts.map((post) => (
                     <MainCard post={post} />
                 ))}
             </Grid>
+
+             
 
             {posts.length === 0 && (
                 <Card sx={{ p: 6, textAlign: 'center' }}>
@@ -96,8 +128,9 @@ function MainCard({ post }) {
     const [selectedPost, setSelectedPost] = useState(null);
     const [toUserId, setToUserId] = useState("");
     const dispatch = useDispatch();
-    // console.log(post, "post");
-    const handleMenuOpen = (event, postId) => {
+    const postId = post._id || post.id;
+
+    const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
         setSelectedPost(postId);
     };
@@ -106,6 +139,17 @@ function MainCard({ post }) {
         setAnchorEl(null);
         setSelectedPost(null);
     };
+
+    const handleMarkAssigned = async (post) => {
+        const id = post._id || post.id;
+        if (!id) return;
+
+        // Update to assigned status, then refresh listing
+        await dispatch(update_post({ id, data: { status: 'assigned' } }));
+        dispatch(get_posts({ }));
+        handleMenuClose();
+    };
+
     const handleEdit = (item) => console.log("Edit:", item);
     const handleDelete = (item) => console.log("Delete:", item);
     const handleView = (item) => console.log("View:", item);
@@ -175,7 +219,7 @@ function MainCard({ post }) {
     return (
         <>
 
-            <Grid item xs={12} md={6} lg={4} key={post.id}>
+            <Grid item xs={12} md={6} lg={4} key={postId}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ flexGrow: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
@@ -184,9 +228,26 @@ function MainCard({ post }) {
                                 color={getStatusColor(post.status)}
                                 size="small"
                             />
-                            <IconButton size="small" onClick={(e) => handleMenuOpen(e, post.id)}>
+                            <IconButton size="small" onClick={handleMenuOpen}>
                                 <MoreVertIcon />
                             </IconButton>
+
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl) && selectedPost === postId}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            >
+                                {post.status !== 'assigned' && (
+                                    <MenuItem onClick={() => handleMarkAssigned(post)}>
+                                        Mark as Assigned
+                                    </MenuItem>
+                                )}
+                                <MenuItem onClick={() => handleView(post)}>View</MenuItem>
+                                <MenuItem onClick={() => handleEdit(post)}>Edit</MenuItem>
+                                <MenuItem onClick={() => handleDelete(post)}>Delete</MenuItem>
+                            </Menu>
                         </Box>
                         <Typography variant="h6" gutterBottom>
                             {post.title}

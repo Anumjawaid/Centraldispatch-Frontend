@@ -11,6 +11,7 @@ export const UPDATE_PASSWORD=URL+"/api/auth/update-password"
 export const GET_USER_INFO=URL+"/users/"
 // POST API'S
 export const POSTS=URL+"/api/post"
+export const ALL_POSTS=URL+"/api/post/all"
 export const CHATS=URL+"/api/chats"
 
 export const GET_CARRIER=URL+"/api/post/get-carriers"

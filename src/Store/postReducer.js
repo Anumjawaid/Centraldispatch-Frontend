@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { GET_CARRIER, POSTS } from '../Constants/URL'
+import { GET_CARRIER, POSTS,ALL_POSTS } from '../Constants/URL'
 
 let initialState = {
 
@@ -24,6 +24,8 @@ let initialState = {
     message: "",
     status: "",
     error: null,
+    pageSize: 20,
+    count:0,
 }
 export const add_post = createAsyncThunk(
     "add_post",
@@ -58,31 +60,35 @@ export const get_posts = createAsyncThunk(
     async (params = {}, thunkApi) => {
         try {
             // attempt to read token from redux state, fallback to localStorage
-
-
             const state = thunkApi.getState();
             const token = state?.authentication?.token || localStorage.getItem('token');
-            console.log("Token:", token);
-            console.log(params,"params");
 
-            // Build query string dynamically
-            const queryString = new URLSearchParams(
-                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
-            ).toString();
-
-            const url = `${POSTS}?${queryString}`;
-            console.log("Fetching:", url);
+            // Prepare request body. All filters are optional.
+            const requestBody = {
+                ...(params.page !== undefined && { page: params.page }),
+                ...(params.pageSize !== undefined && { pageSize: params.pageSize }),
+                ...(params.trailerType !== undefined && { trailerType: params.trailerType }),
+                ...(params.status !== undefined && { status: params.status }),
+                ...(params.assignToMe !== undefined && { assignToMe: params.assignToMe }),
+                ...(params.createdByMe !== undefined && { createdByMe: params.createdByMe }),
+                ...(params.from !== undefined && { from: params.from }),
+                ...(params.to !== undefined && { to: params.to }),
+                ...(params.make !== undefined && { make: params.make }),
+                ...(params.model !== undefined && { model: params.model }),
+                ...(params.state !== undefined && { state: params.state }),
+                ...(params.year !== undefined && { year: params.year }),
+            };
 
             const requestOptions = {
-                method: "GET",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
+                body: JSON.stringify(requestBody),
             };
 
-            const res = await fetch(url, requestOptions);
-            console.log("Fetch completed, status:", res.status);
+            const res = await fetch(ALL_POSTS, requestOptions);
 
             if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);
             return await res.json();
