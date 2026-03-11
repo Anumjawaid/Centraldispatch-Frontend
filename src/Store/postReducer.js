@@ -59,6 +59,7 @@ export const get_posts = createAsyncThunk(
     "posts/get_posts",
     async (params = {}, thunkApi) => {
         try {
+            console.log(params, "params in get posts thunk");
             // attempt to read token from redux state, fallback to localStorage
             const state = thunkApi.getState();
             const token = state?.authentication?.token || localStorage.getItem('token');

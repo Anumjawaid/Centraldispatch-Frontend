@@ -199,7 +199,7 @@ export default function Header() {
               <Button color="inherit" onClick={handleHomeNavigation}>
                 Home
               </Button>
-              <Button
+              {isAuthenticated ? (<Button
                 color="inherit"
                 onClick={handleListingMenuOpen}
                 aria-controls="listing-menu"
@@ -207,24 +207,8 @@ export default function Header() {
               >
                 Listing & Status
               </Button>
-              <Menu
-                id="listing-menu"
-                anchorEl={listingMenuAnchor}
-                open={Boolean(listingMenuAnchor)}
-                onClose={handleListingMenuClose}
-              >
-                {listingSubmenu.map((item) => (
-                  <MenuItem
-                    key={item.path}
-                    onClick={() => {
-                      navigate(item.path);
-                      handleListingMenuClose();
-                    }}
-                  >
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </Menu>
+              )
+              : null}
               <Button color="inherit" onClick={() => navigate('/contact-support')}>
                 Contact & Support
               </Button>

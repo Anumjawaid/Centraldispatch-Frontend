@@ -28,7 +28,7 @@ import { startChat } from '../../utils/socketClient';
 
 
 
-export default function AllPosts() {
+export default function AllPosts({ status = 'listing' }) {
     const navigate = useNavigate();
 
     const postsState = useSelector((state) => state.posts || {});
@@ -42,14 +42,22 @@ export default function AllPosts() {
 
     const [page, setPage] = useState(1);
 
+    // Reset paging when the filter status changes (so new tab starts at page 1)
+    useEffect(() => {
+        setPage(1);
+    }, [status]);
+
     const pageSize = postsData.pageSize || postsData.limit || 20;
     const totalItems = postsData.total || 0;
     const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(totalItems / pageSize)) : 1;
-    console.log(page, pageSize, totalItems, totalPages, "pagination info in all posts");
 
     const handlePageChange = (event, value) => {
         setPage(value);
-        dispatch(get_posts({ page: value }));
+        const params = { page: value };
+        if (status && status !== 'listing') {
+            params.status = status;
+        }
+        dispatch(get_posts(params));
     };
 
     // Keep local page in sync when the API returns a page value
@@ -65,13 +73,7 @@ export default function AllPosts() {
     // console.log(token, "token in dashboard");
     const isLoggedIn = Boolean(user || token);
 
-    // useEffect(() => {
-    //     // Fetch user profile if logged in and user data is not present
-    //     if (isLoggedIn && !user) {
-    //     }
-    //     console.log("Dispatching get_posts");
-    //     dispatch(get_posts());
-    // }, [isLoggedIn, user, dispatch]);
+    
 
 
 

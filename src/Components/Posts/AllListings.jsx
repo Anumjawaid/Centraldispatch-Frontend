@@ -39,18 +39,13 @@ export default function AllListings() {
   const [toUserId, setToUserId] = useState("");
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(get_posts());
-  }, []);
+    const params = {};
+    if (activeTab === 'assigned') params.status = 'Assigned';
+    else if (activeTab === 'pickedup') params.status = 'Shipped';
+    else if (activeTab === 'delivered') params.status = 'Delivered';
 
-  const mockListings = {
-    listing: [...posts],
-    assigned: [
-    ],
-    pickedup: [
-    ],
-    delivered: [
-    ],
-  };
+    dispatch(get_posts(params));
+  }, [activeTab, dispatch]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -70,12 +65,12 @@ export default function AllListings() {
     setChatOpen(true);
   };
 
-  const renderListings = (listings, status) => {
+  const renderListings = (listings, statusLabel, statusFilter) => {
     if (listings.length === 0) {
       return (
         <Card sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="body1" color="text.secondary">
-            No {status} shipments found
+            No {statusLabel} shipments found
           </Typography>
         </Card>
       );
@@ -83,7 +78,7 @@ export default function AllListings() {
 
     return (
       <Grid container spacing={3}>
-        <AllPosts />
+        <AllPosts status={statusFilter} />
       </Grid>
     );
   };
@@ -123,10 +118,10 @@ export default function AllListings() {
             </Tabs>
           </Box>
 
-          {activeTab === 'listing' && renderListings(mockListings.listing, 'listing')}
-          {activeTab === 'assigned' && renderListings(mockListings.assigned, 'assigned')}
-          {activeTab === 'pickedup' && renderListings(mockListings.pickedup, 'picked up')}
-          {activeTab === 'delivered' && renderListings(mockListings.delivered, 'delivered')}
+          {activeTab === 'listing' && renderListings(posts, 'listing', 'listing')}
+          {activeTab === 'assigned' && renderListings(posts, 'assigned', 'assigned')}
+          {activeTab === 'pickedup' && renderListings(posts, 'picked up', 'pickedup')}
+          {activeTab === 'delivered' && renderListings(posts, 'delivered', 'delivered')}
         </Container>
       </Box>
 
