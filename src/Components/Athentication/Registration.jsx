@@ -54,20 +54,78 @@ export default function SignupPage() {
   });
 
   const [openModal, setOpenModal] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [zipError, setZipError] = useState("");
   // used to open the disclaimer when user hits submit
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [pendingFormData, setPendingFormData] = useState(null);
 
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePhone = (phone) => {
+    // Accepts 10-15 digits, optional +, spaces, dashes, parentheses
+    return /^\+?[0-9\s\-()]{10,15}$/.test(phone);
+  };
+  const validateZip = (zip) => {
+    // Accepts US ZIP (12345 or 12345-6789) or Canadian (A1A 1A1)
+    return /^\d{5}(-\d{4})?$|^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(zip);
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (name === "email" || name === "confirmEmail") {
+      if (!validateEmail(value)) {
+        setEmailError("Please enter a valid email address.");
+      } else {
+        setEmailError("");
+      }
+    }
+    if (name === "businessPhone") {
+      if (!validatePhone(value)) {
+        setPhoneError("Please enter a valid phone number.");
+      } else {
+        setPhoneError("");
+      }
+    }
+    if (name === "zipCode") {
+      if (!validateZip(value)) {
+        setZipError("Please enter a valid postal/zip code.");
+      } else {
+        setZipError("");
+      }
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    let valid = true;
+    // Email match
     if (formData.email !== formData.confirmEmail) {
-      alert('Emails do not match!');
-      return;
+      setEmailError('Emails do not match!');
+      valid = false;
     }
+    // Email format
+    if (!validateEmail(formData.email)) {
+      setEmailError('Please enter a valid email address.');
+      valid = false;
+    }
+    // Phone format
+    if (!validatePhone(formData.businessPhone)) {
+      setPhoneError('Please enter a valid phone number.');
+      valid = false;
+    }
+    // Zip format
+    if (!validateZip(formData.zipCode)) {
+      setZipError('Please enter a valid postal/zip code.');
+      valid = false;
+    }
+    if (!valid) return;
+    setEmailError("");
+    setPhoneError("");
+    setZipError("");
     // instead of submitting immediately, open the disclaimer modal
     setPendingFormData(formData);
     setShowDisclaimer(true);
@@ -223,6 +281,8 @@ export default function SignupPage() {
                       value={formData.businessPhone}
                       onChange={handleChange}
                       required
+                      error={!!phoneError}
+                      helperText={phoneError}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -234,6 +294,8 @@ export default function SignupPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      error={!!emailError}
+                      helperText={emailError}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -245,7 +307,8 @@ export default function SignupPage() {
                       value={formData.confirmEmail}
                       onChange={handleChange}
                       required
-                      error={formData.confirmEmail !== '' && formData.email !== formData.confirmEmail}
+                      error={!!emailError || (formData.confirmEmail !== '' && formData.email !== formData.confirmEmail)}
+                      helperText={emailError}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -335,6 +398,8 @@ export default function SignupPage() {
                       value={formData.zipCode}
                       onChange={handleChange}
                       required
+                      error={!!zipError}
+                      helperText={zipError}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>

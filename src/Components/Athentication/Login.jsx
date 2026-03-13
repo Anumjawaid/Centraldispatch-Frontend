@@ -29,45 +29,66 @@ export default function LoginForm({ onLogin }) {
     });
 
     const [error, setError] = useState(null);
+    const [emailError, setEmailError] = useState("");
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+
+    const validateEmail = (email) => {
+        // Simple email regex
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
-        const handleSubmit = (e) => {
-                e.preventDefault();
-                setError(null);
-                // Dispatch login and navigate on success
-                dispatch(login_user(formData))
-                    .then((res) => {
-                        const payload = res.payload || {};
-                        // Support API that returns accessToken and message
-                        const accessToken = payload.accessToken || payload.token || payload.data?.token;
-                        const successMessage = (payload.message || '').toLowerCase().includes('success');  
-                        if (accessToken || successMessage) {
-                            try {
-                                if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
-                                if (accessToken) localStorage.setItem('token', accessToken);
-                                else if (payload.token) localStorage.setItem('token', payload.token);
-                                // connectSocket();
-                            } catch (err) {
-                                // ignore storage errors
-                                console.log("LocalStorage error:", err);
-                            }
-                            navigate('/dashboard');
-                        } else {
-                            setError(payload.message || 'Unable to login. Please check credentials.');
-                        }
-                    })
-                    .catch((err) => {
-                        setError('Login failed. Please try again later.');
-                        console.error(err);
-                        // disconnectSocket();
-                    });
-        };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+        if (name === "email") {
+            if (!validateEmail(value)) {
+                setEmailError("Please enter a valid email address.");
+            } else {
+                setEmailError("");
+            }
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError(null);
+        // Validate email before submitting
+        if (!validateEmail(formData.email)) {
+            setEmailError("Please enter a valid email address.");
+            return;
+        }
+        setEmailError("");
+        // Dispatch login and navigate on success
+        dispatch(login_user(formData))
+            .then((res) => {
+                const payload = res.payload || {};
+                // Support API that returns accessToken and message
+                const accessToken = payload.accessToken || payload.token || payload.data?.token;
+                const successMessage = (payload.message || '').toLowerCase().includes('success');  
+                if (accessToken || successMessage) {
+                    try {
+                        if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
+                        if (accessToken) localStorage.setItem('token', accessToken);
+                        else if (payload.token) localStorage.setItem('token', payload.token);
+                        // connectSocket();
+                    } catch (err) {
+                        // ignore storage errors
+                        console.log("LocalStorage error:", err);
+                    }
+                    navigate('/dashboard');
+                } else {
+                    setError(payload.message || 'Unable to login. Please check credentials.');
+                }
+            })
+            .catch((err) => {
+                setError('Login failed. Please try again later.');
+                console.error(err);
+                // disconnectSocket();
+            });
+    };
 
     return (
         <Box sx={{
@@ -160,8 +181,9 @@ export default function LoginForm({ onLogin }) {
                                         onChange={handleChange}
                                         required
                                         variant="outlined"
+                                        error={!!emailError}
+                                        helperText={emailError}
                                     />
-                                    
                                     <TextField
                                         fullWidth
                                         label="Password"

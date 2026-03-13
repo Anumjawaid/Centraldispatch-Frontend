@@ -159,7 +159,7 @@ function MainCard({ post }) {
         switch (status) {
             case 'listing':
                 return 'info';
-            case 'assigned':
+            case 'Assigned':
                 return 'warning';
             case 'pickedup':
                 return 'primary';
