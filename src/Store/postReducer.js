@@ -62,16 +62,19 @@ export const get_posts = createAsyncThunk(
             console.log(params, "params in get posts thunk");
             // attempt to read token from redux state, fallback to localStorage
             const state = thunkApi.getState();
+            console.log("state in user",state)
             const token = state?.authentication?.token || localStorage.getItem('token');
+            const createdbyme=state?.authentication?.user?.role === 'Shipper' ? true : false;
+            const assignToMe=state?.authentication?.user?.role === 'Carrier' ? true : false;
 
             // Prepare request body. All filters are optional.
             const requestBody = {
                 ...(params.page !== undefined && { page: params.page }),
-                ...(params.pageSize !== undefined && { pageSize: params.pageSize }),
+                ...(params.pageSize !== 5 && { pageSize: params.pageSize }),
+                ...({ createdByMe: createdbyme }),
                 ...(params.trailerType !== undefined && { trailerType: params.trailerType }),
                 ...(params.status !== undefined && { status: params.status }),
-                ...(params.assignToMe !== undefined && { assignToMe: params.assignToMe }),
-                ...(params.createdByMe !== undefined && { createdByMe: params.createdByMe }),
+                ...({ assignToMe: assignToMe }),
                 ...(params.from !== undefined && { from: params.from }),
                 ...(params.to !== undefined && { to: params.to }),
                 ...(params.make !== undefined && { make: params.make }),

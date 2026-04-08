@@ -2,25 +2,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { REGISTRATION, LOGIN,GET_PROFILE } from '../Constants/URL'
 
 let initialState = {
-    "name": "",
-    "email": "",
-    "password": "",
-    "businessType": "",
-    "companyLegalName": "",
-    "confirmEmail": "",
-    "country": "",
-    "city": "",
-    "companyAddress": "",
-    "state": "",
-    "zipCode": "",
-    "operationHoursStart": "",
-    "operationHoursEnd": "",
-    "businessPhone": "",
     loading: false,
     status: "",
     message: "",
-    user: null,
-    token: null,
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
+    token: localStorage.getItem('token') || null,
 }
 
 export const register_user = createAsyncThunk(
@@ -88,6 +74,12 @@ export const authSlice = createSlice({
     reducers: {
         removeMessage: (state, action) => {
             state.message = ""
+        },
+        logout: (state) => {
+            state.user = null;
+            state.token = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
         }
 
 
@@ -128,6 +120,8 @@ export const authSlice = createSlice({
             } else {
                 state.token = accessToken || null;
                 state.user = {...payload.user}
+                localStorage.setItem('token', accessToken);
+                localStorage.setItem('user', JSON.stringify(payload.user));
                 state.message = payload.message || "Successfully logged in";
                 state.status = 'fulfilled';
             }
@@ -144,4 +138,4 @@ export const authSlice = createSlice({
     }
 })
 
-export const { removeMessage } = authSlice.actions
+export const { removeMessage, logout } = authSlice.actions
