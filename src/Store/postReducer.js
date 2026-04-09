@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { GET_CARRIER, POSTS,ALL_POSTS } from '../Constants/URL'
+import { GET_CARRIER, POSTS, ALL_POSTS, ASSIGN_DISPATCH } from '../Constants/URL'
 
 let initialState = {
 
@@ -25,7 +25,7 @@ let initialState = {
     status: "",
     error: null,
     pageSize: 20,
-    count:0,
+    count: 0,
 }
 export const add_post = createAsyncThunk(
     "add_post",
@@ -62,10 +62,10 @@ export const get_posts = createAsyncThunk(
             console.log(params, "params in get posts thunk");
             // attempt to read token from redux state, fallback to localStorage
             const state = thunkApi.getState();
-            console.log("state in user",state)
+            console.log("state in user", state)
             const token = state?.authentication?.token || localStorage.getItem('token');
-            const createdbyme=state?.authentication?.user?.role === 'Shipper' ? true : false;
-            const assignToMe=state?.authentication?.user?.role === 'Carrier' ? true : false;
+            const createdbyme = state?.authentication?.user?.role === 'Shipper' ? true : false;
+            const assignToMe = state?.authentication?.user?.role === 'Carrier' ? true : false;
 
             // Prepare request body. All filters are optional.
             const requestBody = {
@@ -110,7 +110,6 @@ export const get_post_by_id = createAsyncThunk(
         try {
             const state = thunkApi.getState();
             const token = state?.authentication?.token || localStorage.getItem('token');
-            console.log("Token:", token);
             const res = await fetch(`${POSTS}/${id}`, {
                 method: "GET",
                 headers: {
@@ -190,6 +189,34 @@ export const get_carriers = createAsyncThunk(
         }
     }
 )
+export const assign_dispatch = createAsyncThunk(
+    "assign_dispatch",
+    async (data, thunkApi) => {
+        try {
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log(data, "data in get carriers thunk");
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify(data),
+            };
+
+            const res = await fetch(ASSIGN_DISPATCH, requestOptions);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ message: res.statusText }));
+                return thunkApi.rejectWithValue(err.message || `Failed to assign dispatch: ${res.status}`);
+            }
+
+        } catch (error) {
+            return thunkApi.rejectWithValue(error.message || 'Network error');
+        }
+    }
+)
+
 export const postsSlice = createSlice({
     name: "posts",
     initialState,
@@ -304,7 +331,7 @@ export const postsSlice = createSlice({
                 state.status = "rejected";
                 state.message = action.payload || "Failed to delete post";
             });
-             builder
+        builder
             .addCase(get_carriers.pending, (state) => {
                 state.loading = true;
                 state.status = "pending";
@@ -322,6 +349,27 @@ export const postsSlice = createSlice({
                 state.loading = false;
                 state.status = "rejected";
                 state.message = action.payload || "Failed to get carriers";
+            });
+        builder
+            .addCase(assign_dispatch.pending, (state) => {
+                state.loading = true;
+                state.status = "pending";
+                state.message = "";
+            })
+            .addCase(assign_dispatch.fulfilled, (state, action) => {
+                state.loading = false;
+                state.status = "fulfilled";
+                state.message = action.payload?.message || "Dispatcher assigned successfully";
+                // Optionally update the currentPost if needed
+                if (state.currentPost) {
+                    // Assuming the API returns updated post data or we can set status
+                    // state.currentPost.status = 'assigned'; // Uncomment if needed
+                }
+            })
+            .addCase(assign_dispatch.rejected, (state, action) => {
+                state.loading = false;
+                state.status = "rejected";
+                state.message = action.payload || "Failed to assign dispatcher";
             });
     },
 });

@@ -33,7 +33,8 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { get_post_by_id, get_carriers, update_post } from '../../Store/postReducer';
+import { get_post_by_id, get_carriers, update_post, assign_dispatch } from '../../Store/postReducer';
+import { get_user_info } from '../../Store/userReducer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -50,6 +51,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Header from "../Header";
 
 export default function PostDetailsPage() {
   const navigate = useNavigate();
@@ -67,16 +69,6 @@ export default function PostDetailsPage() {
     const carriers = useSelector((state) => state.posts?.carriers || []);
     console.log(carriers, "carriers in post details");
     const [searchPerformed, setSearchPerformed] = useState(false);
-
-    // If a post wasn't provided via navigation state, fetch by id from query params
-    useEffect(() => {
-        if (!postFromLocation && queryId) {
-            dispatch(get_post_by_id(queryId));
-        }
-    }, [dispatch, postFromLocation, queryId]);
-     
-
-    // Hooks must be called unconditionally and in the same order on every render
     const [assignModalOpen, setAssignModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDispatcher, setSelectedDispatcher] = useState(null);
@@ -84,6 +76,34 @@ export default function PostDetailsPage() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+
+    // If a post wasn't provided via navigation state, fetch by id from query params
+    useEffect(() => {
+        if (!postFromLocation && queryId) {
+            dispatch(get_post_by_id(queryId));
+        }
+    }, [dispatch, postFromLocation, queryId]);
+
+    useEffect(() => {
+        const fetchCarrierInfo = async () => {
+            if (post?.status?.toLowerCase() === 'assigned' && post?.carrier) {
+                try {
+                    const result = await dispatch(get_user_info(post.carrier));
+                    const carrierData = result.payload?.data || result.payload;
+                    if (carrierData) {
+                        setSelectedDispatcher(carrierData);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch carrier info:', error);
+                }
+            }
+
+            setSelectedDispatcher(null);
+        };
+
+        fetchCarrierInfo();
+    }, [dispatch, post?.carrier, post?.status]);
 
     
 
@@ -105,12 +125,31 @@ export default function PostDetailsPage() {
         dispatcher.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleAssignDispatcher = (dispatcher) => {
-        setSelectedDispatcher(dispatcher);
-        setAssignModalOpen(false);
-        setSnackbarMessage(`Successfully selected dispatcher: ${dispatcher.name}`);
-        setSnackbarOpen(true);
+    const handleAssignDispatcher = async (dispatcher) => {
+        try {
+            const postId = post._id || post.id;
+            const carrierId = dispatcher._id || dispatcher.id;
+            if (!postId || !carrierId) {
+                setSnackbarMessage('Invalid post or dispatcher data');
+                setSnackbarOpen(true);
+                return;
+            }
+
+            await dispatch(assign_dispatch({ postId, carrierId }));
+            setSelectedDispatcher(dispatcher);
+            setAssignModalOpen(false);
+            setSnackbarMessage(`Successfully assigned dispatcher: ${dispatcher.name || dispatcher.companyName}`);
+            setSnackbarOpen(true);
+
+            // Optionally refresh the post data
+            dispatch(get_post_by_id(postId));
+        } catch (error) {
+            console.error('Failed to assign dispatcher:', error);
+            setSnackbarMessage('Failed to assign dispatcher. Please try again.');
+            setSnackbarOpen(true);
+        }
     };
+
 
     const handleUpdate = () => {
         navigate('/create-post', { state: { post, isEditing: true } });
@@ -139,7 +178,7 @@ export default function PostDetailsPage() {
             case 'not signed':
                 return 'warning';
             case 'assigned':
-                return 'info';
+                return 'success';
             case 'picked up':
                 return 'primary';
             case 'delivered':
@@ -150,13 +189,16 @@ export default function PostDetailsPage() {
     };
 
     return (
+        <>
+         <Header />
         <Box sx={{ bgcolor: '#F9FAFB', minHeight: '100vh', py: 4 }}>
+            
             <Container maxWidth="xl">
-                {/* Header */}
+               
                 <Box sx={{ mb: 3 }}>
                     <Button
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => navigate('/allListings')}
                         sx={{ mb: 2 }}
                     >
                         Back to Dashboard
@@ -173,7 +215,7 @@ export default function PostDetailsPage() {
                         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                             <Chip
                                 label={post.status}
-                                // color={post.status}
+                                color={"success"}
                                 sx={{ px: 2, py: 2.5 }}
                             />
                         </Box>
@@ -230,7 +272,7 @@ export default function PostDetailsPage() {
                 </Box>
 
                 {/* Assigned Dispatcher Info (if assigned) */}
-                {selectedDispatcher && (
+                {post?.status?.toLowerCase() === 'assigned' && selectedDispatcher && (
                     <Paper elevation={2} sx={{ mb: 2, borderRadius: 2, bgcolor: '#E3F2FD' }}>
                         <Box sx={{ p: 2 }}>
                             <Typography variant="subtitle2" color="primary" sx={{ mb: 1 }}>
@@ -250,7 +292,7 @@ export default function PostDetailsPage() {
                                 </Box>
                             </Box>
 
-                            {post.status !== 'assigned' && (
+                            {post.status?.toLowerCase() !== 'assigned' && (
                                 <Button
                                     variant="outlined"
                                     sx={{ mt: 2 }}
@@ -740,5 +782,6 @@ export default function PostDetailsPage() {
                 </Snackbar>
             </Container>
         </Box>
+        </>
     );
 }

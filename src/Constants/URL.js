@@ -9,6 +9,7 @@ export const VERIFY=URL+"/api/auth/verify"
 export const UPDATE_PASSWORD=URL+"/api/auth/update-password"
 // USER API'S
 export const GET_USER_INFO=URL+"/users/"
+export const GET_USER=URL+"/api/users"
 // POST API'S
 export const POSTS=URL+"/api/post"
 export const ALL_POSTS=URL+"/api/post/all"
