@@ -360,6 +360,7 @@ export const postsSlice = createSlice({
                 state.loading = false;
                 state.status = "fulfilled";
                 state.message = action.payload?.message || "Dispatcher assigned successfully";
+                console.log(action.payload,"assign dispatch suxess")
                 // Optionally update the currentPost if needed
                 if (state.currentPost) {
                     // Assuming the API returns updated post data or we can set status
@@ -369,6 +370,8 @@ export const postsSlice = createSlice({
             .addCase(assign_dispatch.rejected, (state, action) => {
                 state.loading = false;
                 state.status = "rejected";
+                console.log(action.payload,"assign dispatch rejected")
+
                 state.message = action.payload || "Failed to assign dispatcher";
             });
     },

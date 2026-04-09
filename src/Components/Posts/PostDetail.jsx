@@ -135,7 +135,7 @@ export default function PostDetailsPage() {
                 return;
             }
 
-            await dispatch(assign_dispatch({ postId, carrierId }));
+            await dispatch(assign_dispatch({ postId:postId, userId:carrierId }));
             setSelectedDispatcher(dispatcher);
             setAssignModalOpen(false);
             setSnackbarMessage(`Successfully assigned dispatcher: ${dispatcher.name || dispatcher.companyName}`);
