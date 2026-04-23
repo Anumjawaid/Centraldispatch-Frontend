@@ -18,6 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { get_mydetails } from '../../Store/authenticationReducer';
+import { update_user } from '../../Store/userReducer';
 
 
 export default function ProfileSettings() {
@@ -58,10 +59,19 @@ export default function ProfileSettings() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: dispatch update profile action when available
-    alert('Profile updated successfully!');
+    try {
+      const result = await dispatch(update_user({
+        id: formData._id || currentUser?.id,
+        ...formData
+      })).unwrap();
+      alert('Profile updated successfully!');
+      console.log('Update response:', result);
+    } catch (error) {
+      alert('Error updating profile: ' + error);
+      console.error('Update error:', error);
+    }
   };
 
   const handlePasswordSubmit = (e) => {
@@ -84,7 +94,7 @@ export default function ProfileSettings() {
       .then((res) => {
         if (!mounted) return;
         const user = res.data || res.user || res;
-        console.log(user)
+        console.log(user,"user in deyails response");
         if (user) {
           setFormData((prev) => ({
             ...prev,
@@ -97,6 +107,7 @@ export default function ProfileSettings() {
             state: user.state || prev.state,
             zipCode: user.zipCode || prev.zipCode,
             country: user.country || prev.country,
+            _id: user.id || user._id
           }));
           // persist to localStorage for consistency
           try {
