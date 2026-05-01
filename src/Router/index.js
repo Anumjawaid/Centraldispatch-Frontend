@@ -17,6 +17,7 @@ import ProfileSettings from '../Components/Dashboard/ProfileSettings';
 import AllListings from '../Components/Posts/AllListings';
 import PostDetailsPage from '../Components/Posts/PostDetail';
 import Test from '../Components/test';
+import Registrationtest from '../Components/Athentication/SignUp/Registration';
 
 export function AppRouter() {
     const user = (typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null);
@@ -30,7 +31,8 @@ export function AppRouter() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<LoginPage />} />
                     {/* <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginPage />} /> */}
-                    <Route path="/register" element={<RegistrationPage />}></Route>
+                    <Route path="/register" element={<Registrationtest />}></Route>
+                    {/* <Route path="/register1" element={<Registrationtest />}></Route> */}
                     <Route path='/test' element={<Test />}></Route>
                     <Route path="/create-post" element={<AddPostsPage />}></Route>
                     <Route path="/userdashboard" element={<UserDashboard />}></Route>
