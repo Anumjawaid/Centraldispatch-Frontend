@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { get_posts } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,10 +30,7 @@ export default function Dashboard() {
 
     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
     const token = auth.token || localStorage.getItem('token');
-    console.log(token, "token in dashboard");
-    console.log(user, "user in dashboard");
     const isLoggedIn = Boolean(user || token);
-    console.log(isLoggedIn, "isLoggedIn in dashboard");
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -65,8 +63,9 @@ export default function Dashboard() {
                         <Typography variant="h4" gutterBottom>
                             Welcome back, {user?.name || 'User'}!
                         </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            {user?.companyLegalName +" Company Name" || 'Your Company'}
+                        <Typography variant="body1" color="primary.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <BusinessIcon fontSize="small" sx={{ color: "primary.main" }} />
+                            {user?.companyLegalName ? `${user.companyLegalName}` : 'Your Company'}
                         </Typography>
                     </Box>
                    
