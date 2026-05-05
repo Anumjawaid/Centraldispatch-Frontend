@@ -153,7 +153,10 @@ function MainCard({ post }) {
         handleMenuClose();
     };
 
-    const handleEdit = (item) => console.log("Edit:", item);
+    const handleEdit = (post) => {
+        const id = post._id || post.id;
+        navigate(`/update-post?id=${id}`);
+    };
     const handleDelete = (item) => console.log("Delete:", item);
     const handleView = (item) => console.log("View:", item);
     const getStatusColor = (status) => {

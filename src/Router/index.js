@@ -16,6 +16,7 @@ import Dashboard from '../Components/Dashboard/userDashboard';
 import ProfileSettings from '../Components/Dashboard/ProfileSettings';
 import AllListings from '../Components/Posts/AllListings';
 import PostDetailsPage from '../Components/Posts/PostDetail';
+import UpdatePost from '../Components/Posts/UpdatePost';
 import Test from '../Components/test';
 import Registrationtest from '../Components/Athentication/SignUp/Registration';
 
@@ -35,6 +36,7 @@ export function AppRouter() {
                     {/* <Route path="/register1" element={<Registrationtest />}></Route> */}
                     <Route path='/test' element={<Test />}></Route>
                     <Route path="/create-post" element={<AddPostsPage />}></Route>
+                    <Route path="/update-post" element={<UpdatePost />}></Route>
                     <Route path="/userdashboard" element={<UserDashboard />}></Route>
                     <Route path="/dashboard" element={<Dashboard />}></Route>
                     <Route path="/allListings" element={<AllListings />}></Route>

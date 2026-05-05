@@ -148,13 +148,35 @@ export const update_post = createAsyncThunk(
     "posts/update_post",
     async ({ id, data }, thunkApi) => {
         try {
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
+            console.log({ id, data, token }, "update_post payload and token");
+
+            const body = JSON.stringify(data);
+            console.log({ id, body }, "update_post request body");
             const res = await fetch(`${POSTS}/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body,
             });
 
-            if (!res.ok) throw new Error(`Failed to update post: ${res.status}`);
+            if (!res.ok) {
+                const rawError = await res.text().catch(() => null);
+                console.error("update_post response text:", rawError);
+                let err = res.statusText;
+                if (rawError) {
+                    try {
+                        const parsed = JSON.parse(rawError);
+                        err = parsed?.message?.toString() || rawError;
+                    } catch (parseError) {
+                        err = rawError;
+                    }
+                }
+                return thunkApi.rejectWithValue(err || `Failed to update post: ${res.status}`);
+            }
             return await res.json();
         } catch (error) {
             return thunkApi.rejectWithValue(error.message);
@@ -341,11 +363,13 @@ export const postsSlice = createSlice({
                     state.currentPost = updatedPost;
                 }
                 state.message = "Post updated successfully";
+                console.log(action.payload, "update post fulfilled in slice");
             })
             .addCase(update_post.rejected, (state, action) => {
                 state.loading = false;
                 state.status = "rejected";
                 state.message = action.payload || "Failed to update post";
+                console.log(action.payload, "update post rejected in slice");
             });
 
         // 🟢 Delete Post
