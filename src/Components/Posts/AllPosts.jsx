@@ -20,7 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ChatScreen from '../Chat/ChatScreen';
-import { get_posts, update_post } from '../../Store/postReducer';
+import { get_posts, update_post, delete_post } from '../../Store/postReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
 import { resetChat, setListingsPaneOpen } from '../../Store/chatReducer';
@@ -157,7 +157,18 @@ function MainCard({ post }) {
         const id = post._id || post.id;
         navigate(`/update-post?id=${id}`);
     };
-    const handleDelete = (item) => console.log("Delete:", item);
+    const handleDelete = async (item) => {
+        const id = item._id || item.id;
+        if (!id) return;
+
+        try {
+            await dispatch(delete_post(id)).unwrap();
+            dispatch(get_posts({}));
+            handleMenuClose();
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+        }
+    };
     const handleView = (item) => console.log("View:", item);
     const getStatusColor = (status) => {
         switch (status) {

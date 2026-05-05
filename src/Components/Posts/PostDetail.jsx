@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { get_post_by_id, get_carriers, update_post, assign_dispatch } from '../../Store/postReducer';
+import { get_post_by_id, get_carriers, update_post, assign_dispatch, delete_post } from '../../Store/postReducer';
 import { get_user_info } from '../../Store/userReducer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -152,16 +152,37 @@ export default function PostDetailsPage() {
 
 
     const handleUpdate = () => {
-        navigate('/create-post', { state: { post, isEditing: true } });
+        const id = post?._id || post?.id;
+        if (!id) {
+            console.error('Unable to update: missing post id');
+            return;
+        }
+        navigate(`/update-post?id=${id}`);
     };
 
-    const handleDeleteConfirm = () => {
-        setDeleteConfirmOpen(false);
-        setSnackbarMessage('Post deleted successfully');
-        setSnackbarOpen(true);
-        setTimeout(() => {
-            navigate('/dashboard');
-        }, 1500);
+    const handleDeleteConfirm = async () => {
+        const postId = post?._id || post?.id;
+        if (!postId) {
+            setDeleteConfirmOpen(false);
+            setSnackbarMessage('Unable to delete post: missing post id');
+            setSnackbarOpen(true);
+            return;
+        }
+
+        try {
+            await dispatch(delete_post(postId)).unwrap();
+            setDeleteConfirmOpen(false);
+            setSnackbarMessage('Post deleted successfully');
+            setSnackbarOpen(true);
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1500);
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+            setDeleteConfirmOpen(false);
+            setSnackbarMessage('Failed to delete post. Please try again.');
+            setSnackbarOpen(true);
+        }
     };
 
     const formatDate = (dateString) => {
