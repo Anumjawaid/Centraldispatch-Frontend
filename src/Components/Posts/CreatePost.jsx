@@ -34,6 +34,7 @@ export default function CreatePost({ currentUser }) {
     const [submitting, setSubmitting] = useState(false);
     const [apiMessage, setApiMessage] = useState("");
     const [apiError, setApiError] = useState("");
+    const [stepError, setStepError] = useState("");
     const redirectTimeoutRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -99,6 +100,85 @@ export default function CreatePost({ currentUser }) {
 
     const steps = ['General Info', 'Pickup Location', 'Delivery Location', 'Vehicle Details', 'Review'];
 
+    // Validation functions
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePhone = (phone) => {
+        const phoneRegex = /^\d{10,15}$/; // Basic check for 10-15 digits
+        return phoneRegex.test(phone.replace(/\D/g, ''));
+    };
+
+    const validateStep = (step) => {
+        setStepError("");
+        switch (step) {
+            case 0: // General Info
+                if (!formData.trailerType || !formData.quotedPriceUsd) {
+                    setStepError("Please fill in Trailer Type and Quoted Price.");
+                    return false;
+                }
+                if (isNaN(parseFloat(formData.quotedPriceUsd)) || parseFloat(formData.quotedPriceUsd) <= 0) {
+                    setStepError("Quoted Price must be a valid positive number.");
+                    return false;
+                }
+                break;
+            case 1: // Pickup Location
+                const pickup = formData.pickupLocation;
+                if (!pickup.name || !pickup.addressLine || !pickup.city || !pickup.stateOrProvince || !pickup.postalCode || !pickup.country) {
+                    setStepError("Please fill in all required pickup location fields.");
+                    return false;
+                }
+                if (!pickup.contactName || !pickup.contactEmail || !pickup.contactPhone) {
+                    setStepError("Please fill in contact details for pickup.");
+                    return false;
+                }
+                if (!validateEmail(pickup.contactEmail)) {
+                    setStepError("Please enter a valid email for pickup contact.");
+                    return false;
+                }
+                if (!validatePhone(pickup.contactPhone)) {
+                    setStepError("Please enter a valid phone number for pickup contact.");
+                    return false;
+                }
+                break;
+            case 2: // Delivery Location
+                const delivery = formData.deliveryLocation;
+                if (!delivery.name || !delivery.addressLine || !delivery.city || !delivery.stateOrProvince || !delivery.postalCode || !delivery.country) {
+                    setStepError("Please fill in all required delivery location fields.");
+                    return false;
+                }
+                if (!delivery.contactName || !delivery.contactEmail || !delivery.contactPhone) {
+                    setStepError("Please fill in contact details for delivery.");
+                    return false;
+                }
+                if (!validateEmail(delivery.contactEmail)) {
+                    setStepError("Please enter a valid email for delivery contact.");
+                    return false;
+                }
+                if (!validatePhone(delivery.contactPhone)) {
+                    setStepError("Please enter a valid phone number for delivery contact.");
+                    return false;
+                }
+                break;
+            case 3: // Vehicle Details
+                const vehicle = formData.vehicles;
+                if (!vehicle.type || !vehicle.year || !vehicle.make || !vehicle.model || !vehicle.color) {
+                    setStepError("Please fill in all required vehicle details.");
+                    return false;
+                }
+                if (isNaN(parseInt(vehicle.year)) || parseInt(vehicle.year) < 1900 || parseInt(vehicle.year) > new Date().getFullYear() + 1) {
+                    setStepError("Please enter a valid year for the vehicle.");
+                    return false;
+                }
+                break;
+            default:
+                break;
+        }
+        return true;
+    };
+
     const handleChange = (e, section, field, index) => {
         const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
         console.log(e.target.value,"value in here")
@@ -141,8 +221,10 @@ export default function CreatePost({ currentUser }) {
     };
 
     const handleNext = () => {
-        setActiveStep((prev) => prev + 1);
-        window.scrollTo(0, 0);
+        if (validateStep(activeStep)) {
+            setActiveStep((prev) => prev + 1);
+            window.scrollTo(0, 0);
+        }
     };
 
     const handleBack = () => {
@@ -349,20 +431,6 @@ export default function CreatePost({ currentUser }) {
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-            {/* Error Alert */}
-            {apiError && (
-                <Alert severity="error" sx={{ mb: 2 }} onClose={() => setApiError("")}>
-                    {apiError}
-                </Alert>
-            )}
-
-            {/* Success Alert */}
-            {apiMessage && (
-                <Alert severity="success" sx={{ mb: 2 }} onClose={() => setApiMessage("")}>
-                    {apiMessage}
-                </Alert>
-            )}
-
             <Container maxWidth="lg" sx={{ py: 6 }}>
                 <Button
                     startIcon={<ArrowBackIcon />}
@@ -388,7 +456,14 @@ export default function CreatePost({ currentUser }) {
                         ))}
                     </Stepper>
 
-                    <form onSubmit={handleSubmit}>
+                    {/* Step Error Alert */}
+                    {stepError && (
+                        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setStepError("")}>
+                            {stepError}
+                        </Alert>
+                    )}
+
+                    <form onSubmit={(e) => e.preventDefault()}>
                         {/* Step 0: General Info */}
                         {activeStep === 0 && (
                             <Box>
@@ -1044,10 +1119,11 @@ export default function CreatePost({ currentUser }) {
                                     </Button>
                                 ) : (
                                     <Button
-                                        type="submit"
+                                        type="button"
                                         variant="contained"
                                         color="primary"
                                         size="large"
+                                        onClick={handleSubmit}
                                     >
                                         Submit Listing
                                     </Button>
@@ -1056,6 +1132,20 @@ export default function CreatePost({ currentUser }) {
                         </Box>
                     </form>
                 </Paper>
+
+                {/* Error Alert */}
+                {apiError && (
+                    <Alert severity="error" sx={{ mb: 2 }} onClose={() => setApiError("")}>
+                        {apiError}
+                    </Alert>
+                )}
+
+                {/* Success Alert */}
+                {apiMessage && (
+                    <Alert severity="success" sx={{ mb: 2 }} onClose={() => setApiMessage("")}>
+                        {apiMessage}
+                    </Alert>
+                )}
             </Container>
         </Box>
     );

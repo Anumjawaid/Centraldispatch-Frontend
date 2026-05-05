@@ -1,9 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { GET_CARRIER, POSTS, ALL_POSTS, ASSIGN_DISPATCH } from '../Constants/URL'
 
-let initialState = {
+const normalizePostsPayload = (payload) => {
+    if (!payload) {
+        return { rows: [], total: 0, page: 1, pageSize: 20 };
+    }
+    if (Array.isArray(payload)) {
+        return { rows: payload, total: payload.length, page: 1, pageSize: 20 };
+    }
+    if (payload.rows) {
+        return {
+            rows: payload.rows || [],
+            total: payload.total ?? payload.count ?? payload.rows.length,
+            page: payload.page ?? payload.currentPage ?? 1,
+            pageSize: payload.pageSize ?? payload.limit ?? 20,
+            ...payload,
+        };
+    }
+    return { rows: [payload], total: 1, page: 1, pageSize: 20 };
+};
 
-    posts: [],            // list of all posts
+let initialState = {
+    posts: { rows: [], total: 0, page: 1, pageSize: 20 },
     currentPost: {
         "trailerType": "",
         "pickupDate": "",
@@ -239,8 +257,17 @@ export const postsSlice = createSlice({
                 state.loading = false;
                 state.status = "fulfilled";
                 state.message = action.payload?.message || "Post created successfully";
-                if (action.payload?.data) {
-                    state.posts.push(action.payload.data);
+                const newPost = action.payload?.data || action.payload;
+                if (newPost) {
+                    if (Array.isArray(state.posts)) {
+                        state.posts.push(newPost);
+                    } else if (state.posts && typeof state.posts === 'object') {
+                        const rows = Array.isArray(state.posts.rows) ? state.posts.rows : [];
+                        state.posts.rows = [...rows, newPost];
+                        state.posts.total = (state.posts.total ?? rows.length) + 1;
+                    } else {
+                        state.posts = { rows: [newPost], total: 1, page: 1, pageSize: state.pageSize };
+                    }
                 }
             })
             .addCase(add_post.rejected, (state, action) => {
@@ -260,7 +287,7 @@ export const postsSlice = createSlice({
             .addCase(get_posts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.status = "fulfilled";
-                state.posts = action.payload?.data || action.payload;
+                state.posts = normalizePostsPayload(action.payload?.data || action.payload);
                 state.message = "Posts fetched successfully";
                 console.log(state.posts, "posts in slice fullfillled");
             })
@@ -300,9 +327,16 @@ export const postsSlice = createSlice({
                 state.loading = false;
                 state.status = "fulfilled";
                 const updatedPost = action.payload?.data || action.payload;
-                state.posts = state.posts.map((p) =>
-                    p.id === updatedPost.id ? updatedPost : p
-                );
+                if (state.posts && Array.isArray(state.posts)) {
+                    state.posts = state.posts.map((p) =>
+                        p.id === updatedPost.id ? updatedPost : p
+                    );
+                } else if (state.posts && typeof state.posts === 'object') {
+                    const rows = Array.isArray(state.posts.rows) ? state.posts.rows : [];
+                    state.posts.rows = rows.map((p) =>
+                        p.id === updatedPost.id ? updatedPost : p
+                    );
+                }
                 if (state.currentPost?.id === updatedPost.id) {
                     state.currentPost = updatedPost;
                 }
@@ -323,7 +357,13 @@ export const postsSlice = createSlice({
             .addCase(delete_post.fulfilled, (state, action) => {
                 state.loading = false;
                 state.status = "fulfilled";
-                state.posts = state.posts.filter((p) => p.id !== action.payload.id);
+                if (state.posts && Array.isArray(state.posts)) {
+                    state.posts = state.posts.filter((p) => p.id !== action.payload.id);
+                } else if (state.posts && typeof state.posts === 'object') {
+                    const rows = Array.isArray(state.posts.rows) ? state.posts.rows : [];
+                    state.posts.rows = rows.filter((p) => p.id !== action.payload.id);
+                    state.posts.total = Math.max(0, (state.posts.total ?? rows.length) - 1);
+                }
                 state.message = "Post deleted successfully";
             })
             .addCase(delete_post.rejected, (state, action) => {

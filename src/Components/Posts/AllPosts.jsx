@@ -81,20 +81,21 @@ export default function AllPosts({ status = 'listing' }) {
         <>
             {/* Recent Posts */}
             
-               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                    <Pagination
-                        count={totalPages}
-                        page={page}
-                        onChange={handlePageChange}
-                        color="primary"
-                    />
-                </Box>
             <Grid container spacing={3}>
                 
                 {posts.map((post) => (
                     <MainCard post={post} />
                 ))}
             </Grid>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, width: '100%' }}>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                />
+            </Box>
 
              
 

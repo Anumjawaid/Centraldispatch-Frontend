@@ -143,26 +143,29 @@ export default function UserDashboard() {
              </Grid>
            </Box>
            {/* User's posts summary */}
-           {isLoggedIn && (
-             <Box sx={{ px: 4, pb: 8 }}>
-               <Typography variant="h6" sx={{ mb: 2 }}>Your Listings</Typography>
-               <Grid container spacing={2}>
-                 {(postsState.posts || []).slice(0,3).map((post, i) => (
-                   <Grid item xs={12} md={4} key={i}>
-                     <Paper sx={{ p:2, borderRadius: 2 }}>
-                       <Typography sx={{ fontWeight: 700 }}>{post.title || post.trailerType || 'Shipment'}</Typography>
-                       <Typography variant="body2" sx={{ color: '#6b7280' }}>{post.price ? `$${post.price}` : ''}</Typography>
-                     </Paper>
-                   </Grid>
-                 ))}
-                 {(!postsState.posts || postsState.posts.length === 0) && (
-                   <Grid item xs={12}>
-                     <Typography variant="body2" sx={{ color: '#6b7280' }}>No listings found. Create your first post from Create Post.</Typography>
-                   </Grid>
-                 )}
-               </Grid>
-             </Box>
-           )}
+           {isLoggedIn && (() => {
+             const recentPosts = Array.isArray(postsState.posts) ? postsState.posts : postsState.posts?.rows || [];
+             return (
+               <Box sx={{ px: 4, pb: 8 }}>
+                 <Typography variant="h6" sx={{ mb: 2 }}>Your Listings</Typography>
+                 <Grid container spacing={2}>
+                   {recentPosts.slice(0,3).map((post, i) => (
+                     <Grid item xs={12} md={4} key={i}>
+                       <Paper sx={{ p:2, borderRadius: 2 }}>
+                         <Typography sx={{ fontWeight: 700 }}>{post.title || post.trailerType || 'Shipment'}</Typography>
+                         <Typography variant="body2" sx={{ color: '#6b7280' }}>{post.price ? `$${post.price}` : ''}</Typography>
+                       </Paper>
+                     </Grid>
+                   ))}
+                   {(recentPosts.length === 0) && (
+                     <Grid item xs={12}>
+                       <Typography variant="body2" sx={{ color: '#6b7280' }}>No listings found. Create your first post from Create Post.</Typography>
+                     </Grid>
+                   )}
+                 </Grid>
+               </Box>
+             );
+           })()}
          </Box>
        </React.Fragment>
   );

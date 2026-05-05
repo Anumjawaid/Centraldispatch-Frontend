@@ -662,7 +662,7 @@ export default function PostDetailsPage() {
                             <br />
                             <TextField
                                 label="Search Dispatcher"
-                                placeholder="Search by name or email..."
+                                placeholder="Search by Comapny Name"
                                 variant="outlined"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
