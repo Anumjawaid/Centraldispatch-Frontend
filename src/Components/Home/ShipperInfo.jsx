@@ -79,8 +79,8 @@ const ShipperInfo = () => (
     {Array.from({ length: Math.ceil(shipperSections.length / 2) }, (_, rowIndex) => (
       <Box key={rowIndex} sx={{ display: 'flex', flexDirection: 'row', gap: 8, mb: rowIndex < Math.ceil(shipperSections.length / 2) - 1 ? 8 : 0, width: '100%' }}>
           {shipperSections.slice(rowIndex * 2, rowIndex * 2 + 2).map((section, index) => (
-            <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 2, backgroundColor: "white", borderRadius: 4, p: 5 }}>
-              <Box sx={{ flex: 0.7, height: '250px' }}>
+            <Box key={index} sx={{ flex: 1, display: 'flex', flexDirection: 'row', gap: 2, backgroundColor: "white", borderRadius: 4, p: 5, alignItems: 'stretch' }}>
+              <Box sx={{ flex: 0.7, minHeight: '250px' }}>
                 <img
                   src={section.image}
                   alt="How it works"
@@ -97,12 +97,12 @@ const ShipperInfo = () => (
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',
-                    justifyContent: 'center',
-                    height: '250px',
+                    justifyContent: 'flex-start',
+                    minHeight: '250px',
                     p: 5,
                   }}
                 >
-                  <CardContent>
+                  <CardContent sx={{ padding: 0 }}>
                     <Box display="flex" flexDirection="column" alignItems="flex-start">
                       <Typography
                         variant="h6"
