@@ -61,7 +61,7 @@ export const add_post = createAsyncThunk(
                 },
                 body: JSON.stringify(data),
             };
-
+            console.log(data, "data in add post thunk");
             const res = await fetch(POSTS, requestOptions);
             if (!res.ok) {
                 const err = await res.json().catch(() => ({ message: res.statusText }));

@@ -12,12 +12,18 @@ import {
     InputLabel,
     Select,
     Checkbox,
+    Switch,
     FormControlLabel,
     Divider,
     Stepper,
-    Alert,
     Step,
+    StepButton,
     StepLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Alert,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -35,6 +41,7 @@ export default function CreatePost({ currentUser }) {
     const [apiMessage, setApiMessage] = useState("");
     const [apiError, setApiError] = useState("");
     const [stepError, setStepError] = useState("");
+    const [priceModalOpen, setPriceModalOpen] = useState(false);
     const redirectTimeoutRef = useRef(null);
 
     const [formData, setFormData] = useState({
@@ -79,9 +86,9 @@ export default function CreatePost({ currentUser }) {
 
         // Vehicle Information
         vehicles: {
-            vinAvailable: 'yes',
+            vinAvailable: true,
             vin: '',
-            type: '',
+            type: 'motorcycle',
             year: '',
             make: '',
             model: '',
@@ -295,7 +302,7 @@ export default function CreatePost({ currentUser }) {
             },
             vehicles: [
                 {
-                    vinAvailable: data.vehicles.vinAvailable === 'yes',
+                    vinAvailable: data.vehicles.vinAvailable,
                     vin: data.vehicles.vin || null,
                     type: vehicleTypeMapping[data.vehicles.type] || data.vehicles.type.toUpperCase(),
                     year: parseInt(data.vehicles.year),
@@ -391,9 +398,9 @@ export default function CreatePost({ currentUser }) {
                     twicRequired: false,
                 },
                 vehicles: {
-                    vinAvailable: 'yes',
+                    vinAvailable: true,
                     vin: '',
-                    type: '',
+                    type: 'Motorcycle',
                     year: '',
                     make: '',
                     model: '',
@@ -448,9 +455,11 @@ export default function CreatePost({ currentUser }) {
                     </Typography>
 
                     <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-                        {steps.map((label) => (
+                        {steps.map((label, index) => (
                             <Step key={label}>
-                                <StepLabel>{label}</StepLabel>
+                                <StepButton onClick={() => setActiveStep(index)}>
+                                    {label}
+                                </StepButton>
                             </Step>
                         ))}
                     </Stepper>
@@ -842,36 +851,51 @@ export default function CreatePost({ currentUser }) {
                         {/* Step 3: Vehicle Details */}
                         {activeStep === 3 && (
                             <Box>
-                                <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-                                    Vehicle Information
-                                </Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                                    <Typography variant="h6">
+                                        Vehicle Information
+                                    </Typography>
+                                    <Button variant="text" onClick={() => setPriceModalOpen(true)}>
+                                        Check Prices
+                                    </Button>
+                                </Box>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} sm={6}>
-                                        <FormControl fullWidth required>
-                                            <InputLabel>VIN Available?</InputLabel>
-                                            <Select
-                                                name="vehicleVinAvailable"
-                                                value={formData.vehicles.vinAvailable}
-                                                onChange={handleChange}
-                                                label="VIN Available?"
-                                            >
-                                                <MenuItem value="yes">Yes</MenuItem>
-                                                <MenuItem value="no">No</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="VIN (Vehicle Identification Number)"
-                                            name="vehicleVin"
-                                            value={formData.vehicles.vin}
-                                            onChange={(e) => handleChange(e, "vehicles", "vin")}
-                                            disabled={formData.vehicles.vinAvailable === 'no'}
-                                            required={formData.vehicles.vinAvailable === 'yes'}
-                                            InputLabelProps={{ shrink: true }}
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    name="vehicleVinAvailable"
+                                                    checked={formData.vehicles.vinAvailable}
+                                                    onChange={(e) => {
+                                                        const available = e.target.checked;
+                                                        setFormData({
+                                                            ...formData,
+                                                            vehicles: {
+                                                                ...formData.vehicles,
+                                                                vinAvailable: available,
+                                                                vin: available ? formData.vehicles.vin : '',
+                                                            },
+                                                        });
+                                                    }}
+                                                    color="primary"
+                                                />
+                                            }
+                                            label="VIN Available"
                                         />
                                     </Grid>
+                                    {formData.vehicles.vinAvailable && (
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="VIN (Vehicle Identification Number)"
+                                                name="vehicleVin"
+                                                value={formData.vehicles.vin}
+                                                onChange={(e) => handleChange(e, "vehicles", "vin")}
+                                                required
+                                                InputLabelProps={{ shrink: true }}
+                                            />
+                                        </Grid>
+                                    )}
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth required>
                                             <InputLabel>Vehicle Type</InputLabel>
@@ -892,6 +916,7 @@ export default function CreatePost({ currentUser }) {
                                             </Select>
                                         </FormControl>
                                     </Grid>
+                                   
                                     <Grid item xs={12} sm={6}>
                                         <TextField
                                             fullWidth
@@ -975,7 +1000,7 @@ export default function CreatePost({ currentUser }) {
                                             rows={3}
                                             value={formData.vehicles.notes}
                                             onChange={(e) => handleChange(e, "vehicles", "notes")}
-                                            placeholder="Any special notes about the vehicle condition, modifications, etc."
+                                            placeholder="Any special notes about the vehicle condition"
                                             InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
@@ -1130,6 +1155,58 @@ export default function CreatePost({ currentUser }) {
                             </Box>
                         </Box>
                     </form>
+
+                    <Dialog open={priceModalOpen} onClose={() => setPriceModalOpen(false)} fullWidth maxWidth="md">
+                        <DialogTitle>Vehicle Price Comparison</DialogTitle>
+                        <DialogContent dividers>
+                            <Box sx={{ display: 'grid', gap: 2 }}>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    Compare vehicle prices by type, model, make, country, and city.
+                                </Typography>
+                                <Box sx={{ overflowX: 'auto' }}>
+                                    <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <Box component="thead">
+                                            <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>Type</Box>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>Make</Box>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>Model</Box>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>Country</Box>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>City</Box>
+                                                <Box component="th" sx={{ textAlign: 'left', p: 1 }}>Price</Box>
+                                            </Box>
+                                        </Box>
+                                        <Box component="tbody">
+                                            {[
+                                                { type: 'Sedan', make: 'Toyota', model: 'Camry', country: 'USA', city: 'Los Angeles', price: '$120' },
+                                                { type: 'SUV', make: 'Honda', model: 'CR-V', country: 'Canada', city: 'Toronto', price: '$140' },
+                                                { type: 'Truck', make: 'Ford', model: 'F-150', country: 'USA', city: 'Houston', price: '$160' },
+                                                { type: 'Van', make: 'Mercedes', model: 'Sprinter', country: 'Germany', city: 'Berlin', price: '$130' },
+                                                { type: 'Motorcycle', make: 'Yamaha', model: 'MT-07', country: 'Japan', city: 'Tokyo', price: '$80' },
+                                                { type: 'Boat', make: 'Bayliner', model: 'Element', country: 'USA', city: 'Miami', price: '$200' },
+                                                { type: 'RV', make: 'Winnebago', model: 'Travato', country: 'USA', city: 'Orlando', price: '$180' },
+                                                { type: 'Other', make: 'Custom', model: 'Utility', country: 'UK', city: 'London', price: '$150' },
+                                            ].map((row) => (
+                                                <Box component="tr" key={`${row.type}-${row.make}-${row.model}`} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.type}</Box>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.make}</Box>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.model}</Box>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.country}</Box>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.city}</Box>
+                                                    <Box component="td" sx={{ p: 1 }}>{row.price}</Box>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setPriceModalOpen(false)}>
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
                 </Paper>
 
                 {/* Error Alert */}
