@@ -9,10 +9,14 @@ import {
     Container,
     Grid,
     Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login_user } from '../../Store/authenticationReducer';
+import { login_user, verify_otp } from '../../Store/authenticationReducer';
 import { connectSocket, disconnectSocket, emitSocketEvent, socket } from '../../utils/socketClient';
 import Logistics from "../../Components/Assets/Logistics.gif";
 
@@ -61,24 +65,20 @@ export default function LoginForm({ onLogin }) {
             return;
         }
         setEmailError("");
-        // Dispatch login and navigate on success
+        // Dispatch login and show OTP modal on success
         dispatch(login_user(formData))
             .then((res) => {
                 const payload = res.payload || {};
-                // Support API that returns accessToken and message
-                const accessToken = payload.accessToken || payload.token || payload.data?.token;
-                const successMessage = (payload.message || '').toLowerCase().includes('success');  
-                if (accessToken || successMessage) {
+                console.log(payload, "payload in login");
+                const isOtpRequired = payload.otpRequired === true;
+                const successMessage = (payload.message || '').toLowerCase().includes('verification code has been sent to your email');
+                if (payload.user || isOtpRequired || successMessage) {
                     try {
                         if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
-                        if (accessToken) localStorage.setItem('token', accessToken);
-                        else if (payload.token) localStorage.setItem('token', payload.token);
-                        // connectSocket();
                     } catch (err) {
-                        // ignore storage errors
                         console.log("LocalStorage error:", err);
                     }
-                    navigate('/dashboard');
+                    setShowOtpModal(true);
                 } else {
                     setError(payload.message || 'Unable to login. Please check credentials.');
                 }
@@ -86,7 +86,44 @@ export default function LoginForm({ onLogin }) {
             .catch((err) => {
                 setError('Login failed. Please try again later.');
                 console.error(err);
-                // disconnectSocket();
+            });
+    };
+
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [otpError, setOtpError] = useState('');
+    const [verifying, setVerifying] = useState(false);
+
+    const handleVerifyOtp = () => {
+        setOtpError('');
+        if (!otp || otp.trim().length === 0) {
+            setOtpError('Please enter the OTP');
+            return;
+        }
+        setVerifying(true);
+        const payload = { email: formData.email, otp };
+        dispatch(verify_otp(payload))
+            .then((res) => {
+                setVerifying(false);
+                const result = res.payload || {};
+                const accessToken = result.accessToken || result.token || result.data?.token;
+                if (accessToken) {
+                    try {
+                        localStorage.setItem('token', accessToken);
+                        if (result.user) localStorage.setItem('user', JSON.stringify(result.user));
+                    } catch (err) {
+                        console.log('LocalStorage error:', err);
+                    }
+                    setShowOtpModal(false);
+                    navigate('/dashboard');
+                } else {
+                    setOtpError(result.message || 'OTP verification failed');
+                }
+            })
+            .catch((err) => {
+                setVerifying(false);
+                setOtpError('OTP verification failed. Please try again.');
+                console.error(err);
             });
     };
 
@@ -255,6 +292,31 @@ export default function LoginForm({ onLogin }) {
                         </Paper>
                     </Grid>
                 </Grid>
+                {/* OTP Verification Modal */}
+                <Dialog open={showOtpModal} onClose={() => setShowOtpModal(false)}>
+                    <DialogTitle>Enter OTP</DialogTitle>
+                    <DialogContent>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            Please enter the OTP sent to your email to complete login.
+                        </Typography>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label="OTP"
+                            fullWidth
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            error={!!otpError}
+                            helperText={otpError}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowOtpModal(false)}>Cancel</Button>
+                        <Button onClick={handleVerifyOtp} disabled={verifying} variant="contained">
+                            {verifying ? <CircularProgress size={20} color="inherit" /> : 'Verify'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
         </Box>
     );
 }

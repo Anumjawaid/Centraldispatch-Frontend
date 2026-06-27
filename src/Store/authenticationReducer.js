@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { REGISTRATION, LOGIN,GET_PROFILE } from '../Constants/URL'
+import { REGISTRATION, LOGIN,GET_PROFILE ,VERIFY_OTP} from '../Constants/URL'
 
 let initialState = {
     loading: false,
@@ -18,7 +18,32 @@ export const register_user = createAsyncThunk(
             body: JSON.stringify(data)
         };
         const res = await fetch(REGISTRATION, requestOptions)
-        return res.json();
+        const payload = await res.json();
+
+        if (!res.ok) {
+            return thunkApi.rejectWithValue(payload);
+        }
+
+        return payload;
+    }
+)
+// VERIFY OTP
+export const verify_otp = createAsyncThunk(
+    "verify_otp",
+    async (data, thunkApi) => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        };
+        const res = await fetch(VERIFY_OTP, requestOptions)
+        const payload = await res.json();
+
+        if (!res.ok) {
+            return thunkApi.rejectWithValue(payload);
+        }
+
+        return payload;
     }
 )
 // Get My Info 
@@ -112,17 +137,15 @@ export const authSlice = createSlice({
         builder.addCase(login_user.fulfilled, (state, action) => {
             console.log("Fullfilled", action.payload)
             const payload = action.payload || {};
-            // try to extract token and user
-            const accessToken = payload.accessToken
-            if (!accessToken && !payload.message) {
+            // On initial login we expect an OTP step; do not persist token here.
+            // Save user info if provided, but keep token null until OTP verification.
+            if (!payload && !payload.message) {
                 state.message = "Unable To Process Request Atm,Try Again Later";
                 state.status = 'rejected';
             } else {
-                state.token = accessToken || null;
-                state.user = {...payload.user}
-                localStorage.setItem('token', accessToken);
-                localStorage.setItem('user', JSON.stringify(payload.user));
-                state.message = payload.message || "Successfully logged in";
+                state.user = payload.user ? { ...payload.user } : state.user;
+                if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
+                state.message = payload.message || "OTP sent for verification";
                 state.status = 'fulfilled';
             }
 
@@ -135,6 +158,39 @@ export const authSlice = createSlice({
             }
 
         })
+        // VERIFY OTP reducers
+        builder.addCase(verify_otp.pending, (state) => {
+            state.loading = true;
+            state.message = "";
+            state.status = "pending";
+        });
+
+        builder.addCase(verify_otp.fulfilled, (state, action) => {
+            state.loading = false;
+            const payload = action.payload || {};
+            const accessToken = payload.accessToken || payload.token || null;
+            if (accessToken) {
+                state.token = accessToken;
+                if (payload.user) state.user = { ...payload.user };
+                try {
+                    localStorage.setItem('token', accessToken);
+                    if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
+                } catch (err) {
+                    console.log('LocalStorage error:', err);
+                }
+                state.message = payload.message || 'OTP verified';
+                state.status = 'fulfilled';
+            } else {
+                state.message = payload.message || 'Unable to verify OTP';
+                state.status = 'rejected';
+            }
+        });
+
+        builder.addCase(verify_otp.rejected, (state, action) => {
+            state.loading = false;
+            state.message = action.payload?.message || 'OTP verification failed';
+            state.status = 'rejected';
+        });
     }
 })
 

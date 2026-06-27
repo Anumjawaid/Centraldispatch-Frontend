@@ -10,17 +10,16 @@ const requiredFields = [
     'confirmEmail',
     'password',
     'businessType',
-    'companyLegalName',
-    'companyAddress',
-    'city',
-    'state',
-    'zipCode',
-    'country',
     'operationHoursStart',
     'operationHoursEnd',
     'businessPhone',
 ];
-
+// 'companyLegalName',
+//     'country',
+//     'state',
+//     'city',
+//     'companyAddress',
+//     'zipCode',
 
 export const useSignupForm = () => {
     const [formData, setFormData] = useState({
@@ -89,14 +88,18 @@ export const useSignupForm = () => {
         ) {
             validationErrors.operationHoursEnd = 'Closing time must be after opening time';
         }
-
+        console.log(validationErrors,"validation Errors")
         if (Object.keys(validationErrors).length) {
             setFormErrors(prev => ({
                 ...prev,
                 ...validationErrors,
                 success: '',
-                error: '',
+                error: 'Please Review the highlighted fields and correct the errors before proceeding.',
             }));
+             setStatus({
+                success: '',
+                error: 'Please Review the highlighted fields and correct the errors before proceeding.',
+            });
             return;
         }
         
@@ -111,29 +114,66 @@ export const useSignupForm = () => {
         try {
             const result = await dispatch(register_user(formData)).unwrap();
             console.log("Registration result:", result);
-            const message = result?.message || 'Registration successful';
-            const isError = result?.status === 'error' || result?.error;
 
-            setStatus(prev => ({
-                ...prev,
-                success: isError ? '' : message,
-                error: isError ? message : '',
-            }));
+            const hasErrors = Array.isArray(result?.errors) && result.errors.length > 0;
+            if (hasErrors) {
+                const parsedErrors = result.errors.reduce((acc, errorText) => {
+                    const match = errorText.match(/"([^"]+)"/);
+                    const fieldName = match ? match[1] : null;
+                    if (fieldName) {
+                        acc[fieldName] = errorText;
+                    }
+                    return acc;
+                }, {});
+
+                setFormErrors(prev => ({
+                    ...prev,
+                    ...parsedErrors,
+                }));
+
+                setStatus({
+                    success: '',
+                    error: 'Registration failed. Please fix the highlighted fields.',
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            const message = result?.message || 'Registration successful';
+
+            setStatus({
+                success: message,
+                error: '',
+            });
             setIsLoading(false);
 
-            // Redirect to login after successful registration
-            if (!isError) {
-                setTimeout(() => {
-                    navigate('/login');
-                }, 2000);
-            }
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
         } catch (submitError) {
             console.log("Registration error:", submitError);
-            setStatus(prev => ({
-                ...prev,
+            const errorPayload = submitError?.errors ? submitError : { message:  'Unable to register at this time.' };
+
+            if (Array.isArray(errorPayload.errors)) {
+                const parsedErrors = errorPayload.errors.reduce((acc, errorText) => {
+                    const match = errorText.match(/"([^"]+)"/);
+                    const fieldName = match ? match[1] : null;
+                    if (fieldName) {
+                        acc[fieldName] = errorText;
+                    }
+                    return acc;
+                }, {});
+
+                setFormErrors(prev => ({
+                    ...prev,
+                    ...parsedErrors,
+                }));
+            }
+
+            setStatus({
                 success: '',
                 error: submitError?.message || 'Unable to register at this time.',
-            }));
+            });
             setIsLoading(false);
         }
     };

@@ -20,7 +20,7 @@ export const CompanyInformation = ({ formData, handleChange, formErrors }) => {
               name="companyLegalName"
               value={formData.companyLegalName}
               onChange={handleChange}
-              required
+              
               error={!!formErrors.companyLegalName}
               helperText={formErrors.companyLegalName}
             />
@@ -32,17 +32,17 @@ export const CompanyInformation = ({ formData, handleChange, formErrors }) => {
               name="companyAddress"
               value={formData.companyAddress}
               onChange={handleChange}
-              required
+              
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="City"
               name="city"
               value={formData.city}
               onChange={handleChange}
-              required
+
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -52,7 +52,7 @@ export const CompanyInformation = ({ formData, handleChange, formErrors }) => {
               name="state"
               value={formData.state}
               onChange={handleChange}
-              required
+
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -62,7 +62,7 @@ export const CompanyInformation = ({ formData, handleChange, formErrors }) => {
               name="zipCode"
               value={formData.zipCode}
               onChange={handleChange}
-              required
+
               error={!!formErrors.zipCode}
               helperText={formErrors.zipCode}
             />
@@ -74,9 +74,10 @@ export const CompanyInformation = ({ formData, handleChange, formErrors }) => {
               name="country"
               value={formData.country}
               onChange={handleChange}
-              required
+
             />
           </Grid>
+         
         </Grid>
       </Paper>
     </Grid>
