@@ -21,6 +21,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { sendMessage, startChat } from "../../utils/socketClient";
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../../Store/chatReducer';
+import { getStoredUser } from '../../utils/storage';
 
 
 export default function ChatScreen({
@@ -31,7 +32,7 @@ export default function ChatScreen({
   toUserId,
 }) {
   //Direct Initializations
-  const ME = JSON.parse(localStorage.getItem("user") || "null")?.id;
+  const ME = getStoredUser()?.id;
   const driverName = driver?.name || 'Driver';
   const driverCompany = driver?.company;
   const shipmentTitle = shipment?.title;

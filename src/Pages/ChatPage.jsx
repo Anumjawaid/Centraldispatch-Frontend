@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchConversationMessages, fetchMyConversations } from '../utils/httpClient';
 import { addMessage, resetChat, resetReadCount, setActiveConversation, setConversationMessages, setMyConversations } from '../Store/chatReducer';
 import Header from '../Components/Header';
+import { getStoredUser } from '../utils/storage';
 const MOCK_USER_ID = '6900f5dff7c93350d6b86d77'; // Mock current user ID
 // --- MOCK DATA MAPPING ---
 // In a real app, this data would come from a backend REST API
@@ -48,7 +49,7 @@ const chatContacts = Object.keys(mockContactMap).map(key => ({
 const initialThreads = {};
 
 export default function ChatPage() {
-  const ME = JSON.parse(localStorage.getItem('user') || 'null')?.id;
+  const ME = getStoredUser()?.id;
   const dispatch = useDispatch();
   const { myConversations, activeConversationId, conversations } = useSelector((state) => state.chat || {});
   const [selectedChatKey, setSelectedChatKey] = useState(null);

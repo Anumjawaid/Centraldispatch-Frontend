@@ -25,6 +25,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
 import { resetChat, setListingsPaneOpen } from '../../Store/chatReducer';
 import { startChat } from '../../utils/socketClient';
+import { getStoredUser } from '../../utils/storage';
 
 
 
@@ -68,7 +69,7 @@ export default function AllPosts({ status = 'listing' }) {
         }
     }, [postsData.page, postsData.currentPage, page]);
 
-    const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+    const user = auth.user || getStoredUser();
     const token = auth.token || localStorage.getItem('token');
     // console.log(token, "token in dashboard");
     const isLoggedIn = Boolean(user || token);
@@ -199,7 +200,7 @@ function MainCard({ post }) {
                 return status;
         }
     };
-    const ME = JSON.parse(localStorage.getItem('user') || 'null');
+    const ME = getStoredUser();
     const handleChatDriver = (post) => {
         // setSelectedDriver({
         //     name: post.driver || 'Available Driver',

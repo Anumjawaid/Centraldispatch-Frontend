@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { REGISTRATION, LOGIN,GET_PROFILE ,VERIFY_OTP} from '../Constants/URL'
+import { getStoredUser } from '../utils/storage'
 
 let initialState = {
     loading: false,
     status: "",
     message: "",
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
+    user: getStoredUser(),
     token: localStorage.getItem('token') || null,
 }
 

@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Header from '../Header';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { resetChat } from '../../Store/chatReducer';
+import { getStoredUser } from '../../utils/storage';
 
 
 export default function Dashboard() {
@@ -28,7 +29,7 @@ export default function Dashboard() {
     console.log(auth, "auth in dashboard");
     
 
-    const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+    const user = auth.user || getStoredUser();
     const token = auth.token || localStorage.getItem('token');
     const isLoggedIn = Boolean(user || token);
 

@@ -14,6 +14,7 @@ import UserHeader from './userHeader';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
+import { getStoredUser } from '../../utils/storage';
 
 export default function UserDashboard() {
 
@@ -25,7 +26,7 @@ export default function UserDashboard() {
      console.log(auth, "auth in dashboard");
      const postsState = useSelector((state) => state.posts || {});
    
-     const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+     const user = auth.user || getStoredUser();
      const token = auth.token || localStorage.getItem('token');
      console.log(token, "token in dashboard");
      const isLoggedIn = Boolean(user || token);
