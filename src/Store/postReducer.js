@@ -109,7 +109,7 @@ export const get_posts = createAsyncThunk(
                 },
                 body: JSON.stringify(requestBody),
             };
-
+           console.log(requestBody, "request body in get posts thunk");
             const res = await fetch(ALL_POSTS, requestOptions);
 
             if (!res.ok) throw new Error(`Failed to fetch posts: ${res.status}`);
@@ -187,9 +187,17 @@ export const delete_post = createAsyncThunk(
     "posts/delete_post",
     async (id, thunkApi) => {
         try {
+            const state = thunkApi.getState();
+            const token = state?.authentication?.token || localStorage.getItem('token');
             const res = await fetch(`${POSTS}/${id}`, {
                 method: "DELETE",
+                
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
             });
+            console.log({ id }, "delete_post request");
 
             if (!res.ok) throw new Error(`Failed to delete post: ${res.status}`);
             return { id }; // return deleted ID to remove it from state

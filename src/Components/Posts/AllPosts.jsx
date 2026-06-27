@@ -13,6 +13,10 @@ import {
     Menu,
     MenuItem,
     Pagination,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -130,6 +134,8 @@ function MainCard({ post }) {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedPost, setSelectedPost] = useState(null);
     const [toUserId, setToUserId] = useState("");
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [deleteTargetPost, setDeleteTargetPost] = useState(null);
     const dispatch = useDispatch();
     const postId = post._id || post.id;
 
@@ -157,17 +163,32 @@ function MainCard({ post }) {
         const id = post._id || post.id;
         navigate(`/update-post?id=${id}`);
     };
-    const handleDelete = async (item) => {
-        const id = item._id || item.id;
-        if (!id) return;
+    const handleDeleteClick = (item) => {
+        setDeleteTargetPost(item);
+        setDeleteConfirmOpen(true);
+        handleMenuClose();
+    };
+    const handleDeleteConfirm = async () => {
+        const id = deleteTargetPost?._id || deleteTargetPost?.id;
+        if (!id) {
+            setDeleteConfirmOpen(false);
+            setDeleteTargetPost(null);
+            return;
+        }
 
         try {
             await dispatch(delete_post(id)).unwrap();
             dispatch(get_posts({}));
-            handleMenuClose();
         } catch (error) {
             console.error('Failed to delete post:', error);
         }
+
+        setDeleteConfirmOpen(false);
+        setDeleteTargetPost(null);
+    };
+    const handleDeleteCancel = () => {
+        setDeleteConfirmOpen(false);
+        setDeleteTargetPost(null);
     };
     const handleView = (item) => console.log("View:", item);
     const getStatusColor = (status) => {
@@ -263,7 +284,7 @@ function MainCard({ post }) {
                                 )}
                                 <MenuItem onClick={() => handleView(post)}>View</MenuItem>
                                 <MenuItem onClick={() => handleEdit(post)}>Edit</MenuItem>
-                                <MenuItem onClick={() => handleDelete(post)}>Delete</MenuItem>
+                                <MenuItem onClick={() => handleDeleteClick(post)}>Delete</MenuItem>
                             </Menu>
                         </Box>
                         <Typography variant="h6" gutterBottom>
@@ -315,6 +336,24 @@ function MainCard({ post }) {
                 driver={selectedDriver}
                 shipment={selectedShipment}
             />
+
+            {/* 🔹 Delete Confirmation Dialog */}
+            <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
+                <DialogTitle sx={{ color: 'error.main' }}>
+                    Confirm Delete
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure you want to delete the post "{deleteTargetPost?.title}"?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteCancel}>Cancel</Button>
+                    <Button onClick={handleDeleteConfirm} variant="contained" color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
         </>
     )
