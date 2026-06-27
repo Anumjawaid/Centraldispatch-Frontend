@@ -1,6 +1,6 @@
 let TEST_URL="http://localhost:3000"
 // let PROD_URL="https://y-jiaabid98-4770-jiaabid98-gmailcoms-projects.vercel.app"
-let PROD_URL="https://y-ml1nh9gz3-jiaabid98-gmailcoms-projects.vercel.app"
+let PROD_URL="https://y-ochre-seven-44.vercel.app"
 let URL=PROD_URL
 // let URL=TEST_URL
 // AUTH API'S
