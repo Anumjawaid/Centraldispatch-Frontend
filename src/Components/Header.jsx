@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../Store/authenticationReducer';
+import { getStoredUser } from '../utils/storage';
 
 
 export default function Header() {
@@ -25,7 +26,7 @@ export default function Header() {
   const dispatch = useDispatch();
   let isAuthenticated = false;
   const auth = useSelector((state) => state.authentication || {});
-  const user = auth.user || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+  const user = auth.user || getStoredUser();
   const token = auth.token || localStorage.getItem('token');
     if(token != null){
       isAuthenticated = true;

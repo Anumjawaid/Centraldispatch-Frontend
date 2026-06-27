@@ -19,9 +19,10 @@ import PostDetailsPage from '../Components/Posts/PostDetail';
 import UpdatePost from '../Components/Posts/UpdatePost';
 import Test from '../Components/test';
 import Registrationtest from '../Components/Athentication/SignUp/Registration';
+import { getStoredUser } from '../utils/storage';
 
 export function AppRouter() {
-    const user = (typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null);
+    const user = getStoredUser();
     const token = (typeof window !== "undefined" ? localStorage.getItem("token") : null);
     const isLoggedIn = Boolean(user || token);
     return (

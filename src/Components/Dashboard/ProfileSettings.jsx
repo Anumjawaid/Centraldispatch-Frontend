@@ -19,13 +19,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useDispatch, useSelector } from 'react-redux';
 import { get_mydetails } from '../../Store/authenticationReducer';
 import { update_user } from '../../Store/userReducer';
+import { getStoredUser } from '../../utils/storage';
 
 
 export default function ProfileSettings() {
   const dispatch = useDispatch();
   let navigate = useNavigate();
-  const currentUser = useSelector((state) => state.authentication?.user) ||
-    (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+  const currentUser = useSelector((state) => state.authentication?.user) || getStoredUser();
 
   const [formData, setFormData] = useState({
     name: currentUser?.name || '',
