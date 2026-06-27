@@ -309,8 +309,7 @@ export default function CreatePost({ currentUser }) {
                     inoperable: data.vehicles.inoperable,
                     oversized: data.vehicles.oversized,
                     availableDate: formatDateToISO(data.vehicles.availableDate),
-                    desiredDeliveryDate: formatDateToISO(data.vehicles.desiredDeliveryDate),
-                    expirationDate: formatDateToISO(data.vehicles.expirationDate)
+                    desiredDeliveryDate: formatDateToISO(data.vehicles.desiredDeliveryDate)
                 }
             ]
         };

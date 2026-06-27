@@ -1,8 +1,8 @@
 let TEST_URL="http://localhost:3000"
 // let PROD_URL="https://y-jiaabid98-4770-jiaabid98-gmailcoms-projects.vercel.app"
 let PROD_URL="http://y-2ct3x453t-jiaabid98-gmailcoms-projects.vercel.app"
-// let URL=PROD_URL
-let URL=TEST_URL
+let URL=PROD_URL
+// let URL=TEST_URL
 // AUTH API'S
 export const REGISTRATION=URL+"/api/auth/register"
 export const LOGIN=URL+"/api/auth/login"
