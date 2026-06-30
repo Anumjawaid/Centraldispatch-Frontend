@@ -17,7 +17,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { get_mydetails } from '../../Store/authenticationReducer';
+import { get_mydetails, update_password } from '../../Store/authenticationReducer';
 import { update_user } from '../../Store/userReducer';
 import { getStoredUser } from '../../utils/storage';
 
@@ -74,14 +74,31 @@ export default function ProfileSettings() {
     }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       alert('New passwords do not match!');
       return;
     }
-    alert('Password changed successfully!');
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+    if (!currentUser?.email) {
+      alert('Unable to update password without an email address.');
+      return;
+    }
+
+    try {
+      const result = await dispatch(update_password({
+        email: currentUser.email,
+        newPassword: passwordData.newPassword,
+      })).unwrap();
+
+      alert(result?.message || 'Password changed successfully!');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      alert(error?.message || 'Error updating password');
+      console.error('Password update error:', error);
+    }
   };
 
   useEffect(() => {

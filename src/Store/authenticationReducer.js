@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { REGISTRATION, LOGIN,GET_PROFILE ,VERIFY_OTP} from '../Constants/URL'
+import { REGISTRATION, LOGIN,GET_PROFILE ,VERIFY_OTP, UPDATE_PASSWORD} from '../Constants/URL'
 import { getStoredUser } from '../utils/storage'
 
 let initialState = {
@@ -38,6 +38,30 @@ export const verify_otp = createAsyncThunk(
             body: JSON.stringify(data)
         };
         const res = await fetch(VERIFY_OTP, requestOptions)
+        const payload = await res.json();
+
+        if (!res.ok) {
+            return thunkApi.rejectWithValue(payload);
+        }
+
+        return payload;
+    }
+)
+
+export const update_password = createAsyncThunk(
+    "update_password",
+    async (data, thunkApi) => {
+        const state = thunkApi.getState();
+        const token = state?.authentication?.token || localStorage.getItem('token');
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify(data)
+        };
+        const res = await fetch(UPDATE_PASSWORD, requestOptions)
         const payload = await res.json();
 
         if (!res.ok) {
@@ -190,6 +214,24 @@ export const authSlice = createSlice({
         builder.addCase(verify_otp.rejected, (state, action) => {
             state.loading = false;
             state.message = action.payload?.message || 'OTP verification failed';
+            state.status = 'rejected';
+        });
+
+        builder.addCase(update_password.pending, (state) => {
+            state.loading = true;
+            state.message = "";
+            state.status = "pending";
+        });
+
+        builder.addCase(update_password.fulfilled, (state, action) => {
+            state.loading = false;
+            state.message = action.payload?.message || 'Password updated successfully';
+            state.status = 'fulfilled';
+        });
+
+        builder.addCase(update_password.rejected, (state, action) => {
+            state.loading = false;
+            state.message = action.payload?.message || 'Unable to update password, try again later.';
             state.status = 'rejected';
         });
     }

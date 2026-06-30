@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login_user, verify_otp } from '../../Store/authenticationReducer';
+import { login_user, verify_otp, update_password } from '../../Store/authenticationReducer';
 import { connectSocket, disconnectSocket, emitSocketEvent, socket } from '../../utils/socketClient';
 import Logistics from "../../Components/Assets/Logistics.gif";
 
@@ -32,8 +32,15 @@ export default function LoginForm({ onLogin }) {
         password: "",
     });
 
-    const [error, setError] = useState(null);
+    const [feedback, setFeedback] = useState(null);
     const [emailError, setEmailError] = useState("");
+    const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+    const [forgotPasswordData, setForgotPasswordData] = useState({
+        email: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+    const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
 
 
     const validateEmail = (email) => {
@@ -58,7 +65,7 @@ export default function LoginForm({ onLogin }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setError(null);
+        setFeedback(null);
         // Validate email before submitting
         if (!validateEmail(formData.email)) {
             setEmailError("Please enter a valid email address.");
@@ -69,22 +76,27 @@ export default function LoginForm({ onLogin }) {
         dispatch(login_user(formData))
             .then((res) => {
                 const payload = res.payload || {};
+                const message = payload.message || "";
                 console.log(payload, "payload in login");
                 const isOtpRequired = payload.otpRequired === true;
-                const successMessage = (payload.message || '').toLowerCase().includes('verification code has been sent to your email');
-                if (payload.user || isOtpRequired || successMessage) {
+                const hasSuccessfulMessage = Boolean(message) || payload.user || isOtpRequired;
+
+                if (hasSuccessfulMessage) {
                     try {
                         if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
                     } catch (err) {
                         console.log("LocalStorage error:", err);
                     }
+                    if (message) {
+                        setFeedback({ type: 'info', message });
+                    }
                     setShowOtpModal(true);
                 } else {
-                    setError(payload.message || 'Unable to login. Please check credentials.');
+                    setFeedback({ type: 'error', message: 'Unable to login. Please check credentials.' });
                 }
             })
             .catch((err) => {
-                setError('Login failed. Please try again later.');
+                setFeedback({ type: 'error', message: 'Login failed. Please try again later.' });
                 console.error(err);
             });
     };
@@ -93,6 +105,45 @@ export default function LoginForm({ onLogin }) {
     const [otp, setOtp] = useState('');
     const [otpError, setOtpError] = useState('');
     const [verifying, setVerifying] = useState(false);
+
+    const handleForgotPasswordChange = (e) => {
+        const { name, value } = e.target;
+        setForgotPasswordData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleForgotPasswordSubmit = async () => {
+        if (!forgotPasswordData.email || !validateEmail(forgotPasswordData.email)) {
+            setFeedback({ type: 'error', message: 'Please enter a valid email address.' });
+            return;
+        }
+
+        if (!forgotPasswordData.newPassword || forgotPasswordData.newPassword !== forgotPasswordData.confirmPassword) {
+            setFeedback({ type: 'error', message: 'Passwords do not match.' });
+            return;
+        }
+
+        setForgotPasswordLoading(true);
+        try {
+            const result = await dispatch(update_password({
+                email: forgotPasswordData.email,
+                newPassword: forgotPasswordData.newPassword,
+            })).unwrap();
+
+            setFeedback({ type: 'success', message: result?.message || 'Password updated successfully.' });
+            setShowForgotPasswordModal(false);
+            setForgotPasswordData({ email: '', newPassword: '', confirmPassword: '' });
+        } catch (error) {
+            setFeedback({
+                type: 'error',
+                message: error?.message || error?.payload?.message || 'Unable to update password. Please try again.',
+            });
+        } finally {
+            setForgotPasswordLoading(false);
+        }
+    };
 
     const handleVerifyOtp = () => {
         setOtpError('');
@@ -232,10 +283,10 @@ export default function LoginForm({ onLogin }) {
                                         variant="outlined"
                                     />
 
-                                    {/* Error Alert */}
-                                    {error && (
-                                        <Alert severity="error" sx={{ width: '100%' }}>
-                                            {error}
+                                    {/* Feedback Alert */}
+                                    {feedback && (
+                                        <Alert severity={feedback.type} sx={{ width: '100%' }}>
+                                            {feedback.message}
                                         </Alert>
                                     )}
 
@@ -271,16 +322,28 @@ export default function LoginForm({ onLogin }) {
                                         </Button>
                                     </Box>
 
-                                    {/* Sign up link */}
+                                    {/* Sign up / forgot password links */}
                                     <Box sx={{ textAlign: 'center', mt: 2, width: '100%' }}>
                                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            Don't have an account?{' '}
+                                            <Button
+                                                onClick={() => setShowForgotPasswordModal(true)}
+                                                sx={{
+                                                    textTransform: 'none',
+                                                    fontWeight: 'bold',
+                                                    textDecoration: 'underline',
+                                                    mr: 1,
+                                                }}
+                                            >
+                                                Forgot password?
+                                            </Button>
+                                            <span>•</span>
                                             <Button
                                                 onClick={() => navigate('/register')}
                                                 sx={{
                                                     textTransform: 'none',
                                                     fontWeight: 'bold',
-                                                    textDecoration: 'underline'
+                                                    textDecoration: 'underline',
+                                                    ml: 1,
                                                 }}
                                             >
                                                 Sign up here
@@ -292,6 +355,49 @@ export default function LoginForm({ onLogin }) {
                         </Paper>
                     </Grid>
                 </Grid>
+                {/* Forgot Password Modal */}
+                <Dialog open={showForgotPasswordModal} onClose={() => setShowForgotPasswordModal(false)}>
+                    <DialogTitle>Reset Password</DialogTitle>
+                    <DialogContent>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                            Enter your email and a new password to reset your account password.
+                        </Typography>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label="Email"
+                            name="email"
+                            fullWidth
+                            value={forgotPasswordData.email}
+                            onChange={handleForgotPasswordChange}
+                        />
+                        <TextField
+                            margin="dense"
+                            label="New Password"
+                            name="newPassword"
+                            type="password"
+                            fullWidth
+                            value={forgotPasswordData.newPassword}
+                            onChange={handleForgotPasswordChange}
+                        />
+                        <TextField
+                            margin="dense"
+                            label="Confirm Password"
+                            name="confirmPassword"
+                            type="password"
+                            fullWidth
+                            value={forgotPasswordData.confirmPassword}
+                            onChange={handleForgotPasswordChange}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowForgotPasswordModal(false)}>Cancel</Button>
+                        <Button onClick={handleForgotPasswordSubmit} disabled={forgotPasswordLoading} variant="contained">
+                            {forgotPasswordLoading ? <CircularProgress size={20} color="inherit" /> : 'Confirm'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
                 {/* OTP Verification Modal */}
                 <Dialog open={showOtpModal} onClose={() => setShowOtpModal(false)}>
                     <DialogTitle>Enter OTP</DialogTitle>

@@ -11,8 +11,8 @@ export const LOGIN=URL+"/api/auth/login"
 export const VERIFY_OTP=URL+"/api/auth/verify-otp"
 export const GET_PROFILE=URL+"/api/auth/me"
 export const VERIFY=URL+"/api/auth/verify"
-
 export const UPDATE_PASSWORD=URL+"/api/auth/update-password"
+
 // USER API'S
 export const GET_USER_INFO=URL+"/users/"
 export const GET_USER=URL+"/api/users"

@@ -87,7 +87,7 @@ export default function CreatePost({ currentUser }) {
         // Vehicle Information
         vehicles: {
             vinAvailable: true,
-            vin: '',
+            vin: '0',
             type: 'motorcycle',
             year: '',
             make: '',
